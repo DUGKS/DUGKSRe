@@ -120,13 +120,20 @@ void DiagonalCellConstruct()
 	}
 }
 /*
-****               ****
-*0 *               * 2*
-****               ****
-----------face--------->
-****       |       ****
-*1 *     normal    * 3*
-****       |       ****
+*****************
+*       |       *
+*   2   |   3   *
+*       |       *
+********^********
+*       ×       *    normal
+* owner × neigh *   -------->
+*       ×       *
+*****************
+*       |       *
+*   0   |   1   *
+*       |       *
+*****************
+//set _dx,_dy
 */
 void CarfaceCellsConstruct()
 {
@@ -143,6 +150,7 @@ void CarfaceCellsConstruct()
 				exit(-1);
 			}
 			face._dx = 2*(face.faceNodes[1]->xN - face.faceNodes[0]->xN);
+			face._dy = face.owner->yc - face.neigh->yc;
 			if(doubleEqual(FaceArray[n].Vy,1))
 			{
 				if(face.neigh != face.owner->Cell_C[1])
@@ -200,6 +208,7 @@ void CarfaceCellsConstruct()
 				getchar();
 				exit(-1);
 			}
+			face._dx = face.owner->xc - face.neigh->xc;
 			face._dy = 2*(face.faceNodes[1]->yN - face.faceNodes[0]->yN);
 			if(doubleEqual(FaceArray[n].Vx,1))
 			{
@@ -416,13 +425,13 @@ void DeallocateCarCellArray()
 	delete[] CarCellArray;
 	CarCellArray = nullptr;
 }
-void SetFace_dxdy()
-{
-	for(int n = 0;n < Faces;++n)
-	{
-		FaceArray[n]._dx = FaceArray[n].owner->xc - FaceArray[n].neigh->xc;
-		FaceArray[n]._dy = FaceArray[n].owner->yc - FaceArray[n].neigh->yc; 
-		SetZero(FaceArray[n]._dx);
-		SetZero(FaceArray[n]._dy);
-	}
-}
+// void SetFace_dxdy()
+// {
+// 	for(int n = 0;n < Faces;++n)
+// 	{
+// 		FaceArray[n]._dx = FaceArray[n].owner->xc - FaceArray[n].neigh->xc;
+// 		FaceArray[n]._dy = FaceArray[n].owner->yc - FaceArray[n].neigh->yc; 
+// 		SetZero(FaceArray[n]._dx);
+// 		SetZero(FaceArray[n]._dy);
+// 	}
+// }

@@ -55,6 +55,13 @@ p_R = Rho_R*R0*T_R,
 
 Lambda_R = 1.0/(2*R0*T_R);
 
+namespace RBF
+{
+	const double c = 35;
+
+	void setInverseM();
+}
+
 //------------------------multiphase------------------------------
 namespace PhaseFieldAC
 {

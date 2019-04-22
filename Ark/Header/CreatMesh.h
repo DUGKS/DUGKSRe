@@ -4,7 +4,7 @@ FacesClassify();
 ShadowCellConstruct();
 NeighbourCellConstruct();
 #ifdef _CARTESIAN_MESH_FLIP
-SetFace_dxdy();
+//SetFace_dxdy();
 ShadowCellCornerConstruct();
 DiagonalCellConstruct();
 CarfaceCellsConstruct();

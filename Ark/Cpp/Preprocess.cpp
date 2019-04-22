@@ -1170,6 +1170,32 @@ void TaylorCouetteInitialization()
 		WallShadowCA[nB].Factor();
 	}
 }
+double RBFTestAnalytic(double const x,double const y)
+{
+	return Rho0*(cos(4.0*PI*x/ChLength)-cos(4.0*PI*y/ChLength));
+	// return Rho0*sin(4.0*PI*x/ChLength)*cos(2.0*PI*y/ChLength);
+}
+void RBFTestFunc()
+{
+	caseName = __func__;
+	MacroQuantity init(Rho0,U0,V0,p0,T0,Lambda0,Mu0);
+
+	LoopPS(Cells)
+	{
+		Cell_2D &cell = CellArray[n];
+		cell.MsQ().Rho = RBFTestAnalytic(cell.xc,cell.yc);
+
+		#ifdef _ARK_ALLENCAHN_FLIP
+		CellArray[n].h.BarP[5] = cell.MsQ().Rho;
+		#endif
+
+		LoopVS(Q)
+		{
+			
+		}
+	}
+
+}
 //-----------------------------------D2Q9------------------------
 /*void TaylorCouetteInitialization()
 {

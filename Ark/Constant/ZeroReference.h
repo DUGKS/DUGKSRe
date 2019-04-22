@@ -7,25 +7,25 @@
 //----------------------Mesh file---------------
 const int 
 
-Nx = 200,
+Nx = 512,
 
-Ny = 200,
+Ny = 512,
 
-NL = 200;//name of mesh file
+NL = 512;//name of mesh file
 
 const double
 
-ChLength = 200.0,
+ChLength = 512.0,
 
 MinL = ChLength/NL,//ChLength/NL,//6.037849742228585e-02,//3.079505855617000e-02,//1.555181192035053e-02,
 //7.776141069016656e-03,//
 X_Beg = 0.0,
 
-X_End = 200,
+X_End = 512,
 
 Y_Beg = 0.0,
 
-Y_End = 200,
+Y_End = 512,
 
 Lx = X_End - X_Beg,
 

@@ -45,7 +45,7 @@
 #endif
 
 #ifndef _MESHFILE_NAME_ARK
-#define _MESHFILE_NAME_ARK "200_200_Car_Periodic_Square_LBM"
+#define _MESHFILE_NAME_ARK "512_512_Car_Periodic_Square_LBM"
 #endif
 //----------------Boundary Condition Macro------------------
 

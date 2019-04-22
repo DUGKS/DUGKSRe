@@ -4,7 +4,7 @@ vpath %.cpp Cpp:Cpp/Mesh:Lib
 Target = PFDUGKS
 QModel = D2Q9AC
 
-CC = icpc 
+CC = g++ 
 
 CFLAGS = -std=c++11 -Wall -Wextra -I./Header -I./Lib -I./Constant -O3
 

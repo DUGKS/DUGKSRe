@@ -20,7 +20,7 @@
 
 #define fs "    "
 
-#define Info cout<<setiosflags(ios::scientific)<<setprecision(12)
+#define Info cout<<setiosflags(ios::scientific)<<setprecision(4)
 
 #define OUTCASE "../FlowField/"
 

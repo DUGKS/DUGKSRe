@@ -10,7 +10,7 @@ public:
 	~Cell_2D();
 	static int const nN = 4;
 //-----------Mesh------------------
-	Cell_2D *ShadowC = nullptr;
+	Cell_2D *ShadowC = nullptr; //always be nullptr for nonshadow cell 
 	Face_2D *BoundF = nullptr;
 	unsigned zone = 0;
 	int celltype = 0;
@@ -25,10 +25,13 @@ public:
 	Cell_2D *Cell_Diag[nN] = {nullptr,nullptr,nullptr,nullptr};
 //
 	int signFlux[nN] = {0};
-//---------------------------------------------------------
+//-------------------------Least Square-------------------------------
 	double LS_M[2][2] = {{0.0,0.0},{0.0,0.0}};
 	double wdx_C[4] = {0.0};
 	double wdy_C[4] = {0.0};
+//---------------------Radial basis function--------------------------
+	double wRBF[9] = {0.0};// here 9 is RBF::DIM
+
 	void SetVolume();
 //
 	class DVDF

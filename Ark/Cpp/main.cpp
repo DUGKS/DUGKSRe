@@ -96,8 +96,11 @@ extern void AC_ZalesakDisk();
 extern void AC_DiagTrans();
 extern void AC_SpinodalDecomposition();
 extern void AC_RayleighTaylor();
+extern void RBFTestFunc();
+//-----------------RBF.cpp------------------------
 //----------------Inc_2DSolver.cpp----------------
 extern void DUGKS2DSolver();
+extern void RBFPrecisionTest();
 //--------------Output.cpp------------------------
 extern void OutputCase();
 extern void Output_Convergence();
@@ -110,22 +113,10 @@ int main()
 	string MeshName(_MESHFILE_NAME_ARK);
 	SelfCheck();
 	#include "CreatMesh.h"
-//- - - - - - - - -Mesh- - - - - - - - - - - - -
-	// MeshConstruct(MeshName);
-	// MeshArea();
-	// FacesClassify();
-	// ShadowCellConstruct();
-	// NeighbourCellConstruct();
-	// OutputCase();
-	// #ifdef _CARTESIAN_MESH_FLIP
-	// SetFace_dxdy();
-	// ShadowCellCornerConstruct();
-	// DiagonalCellConstruct();
-	// CarfaceCellsConstruct();
-	// #endif
 //-----------------Preprocess--------------------
 	AllocateResource();
 	Grad_LSMatrix();
+	RBF::setInverseM();
 	MeshCheck();
 
 //-------------------Initialization-------------------
@@ -133,7 +124,8 @@ int main()
 	OutputCase();
 //------------------Solve-------------------
 	#ifndef _ZERO_NDEBUG_FLIP
-	DUGKS2DSolver();
+	//DUGKS2DSolver();
+	RBFPrecisionTest();
 	#endif
 //------------------Afterprocess----------------
 	#ifdef _ZERO_NDEBUG_FLIP
