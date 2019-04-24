@@ -69,7 +69,7 @@ public:
 	DVDF f;
 	#endif
 //
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	DVDF g;
 	#endif
 //

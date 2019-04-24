@@ -10,7 +10,7 @@ void Face_2D::assign(const Face_2D& rhs)
 	f = rhs.f;
 	#endif
 	//
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	g = rhs.g;
 	#endif
 //
@@ -133,7 +133,7 @@ void Face_2D::Factor()
 	f.setxh();
 	#endif
 	//energy
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	g.setxh();
 	#endif
 }

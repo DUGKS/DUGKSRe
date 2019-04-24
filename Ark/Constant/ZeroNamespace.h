@@ -148,6 +148,8 @@ namespace PseudoPotentialSC
 
 	Tr = 0.85,
 
+	wI = 5,
+
 	radius = 0.25*ChLength;
 }
 /*const int
@@ -173,18 +175,18 @@ const int
 
 VelocityZone = 7,//7 == TC
 
-End_Step = PhaseFieldAC::iT + 1000,//log(2.0)/(8.0*PI*PI*Nu0*dt),
+End_Step = 100000,//log(2.0)/(8.0*PI*PI*Nu0*dt),
 
-ZeroDebugControl = 1000, //
+ZeroDebugControl = 100, //
 
 ConvergenceControl = 1000, //SumRho,SumT,independent
 
 ResidualControl = 1000, //print to screen
 
-writeFileControl = 100000; //always >= ResidualControl
+writeFileControl = 1000; //always >= ResidualControl
 
 double const
 
-RESIDUAL = 1E-10;
+RESIDUAL = 1E-8;
 
 #endif

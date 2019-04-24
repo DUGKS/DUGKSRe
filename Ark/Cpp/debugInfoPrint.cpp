@@ -260,7 +260,7 @@ void Output_fT_Append(Cell_2D &cell,double dt)
 // 				    <<'\n';
 // 	OutFile_gFlux.close();
 // }
-#ifndef _ARK_ISOTHERMAL_FLIP
+#ifdef _ARK_THERMAL_FLIP
 void Output_gBh(Face_2D& face,double t)
 {
 	ostringstream oss_gBh;
@@ -384,14 +384,14 @@ void Output_phi_Bh(Face_2D &face,double t)
 		if(xi_u[QuIndex]>=0)
 		{
 			OutFile_fBh_R<<face.f.BhDt[i][j]<<'\n';
-			#ifndef _ARK_ISOTHERMAL_FLIP
+			#ifdef _ARK_THERMAL_FLIP
 			OutFile_gBh_R<<face.g.BhDt[i][j]<<'\n';
 			#endif
 		}
 		else
 		{
 			OutFile_fBh_L<<face.f.BhDt[i][j]<<'\n';
-			#ifndef _ARK_ISOTHERMAL_FLIP
+			#ifdef _ARK_THERMAL_FLIP
 			OutFile_gBh_L<<face.g.BhDt[i][j]<<'\n';
 			#endif
 		}

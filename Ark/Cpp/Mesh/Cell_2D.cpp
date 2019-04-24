@@ -10,7 +10,7 @@ void Cell_2D::assign(const Cell_2D &rhs)
 	f = rhs.f;
 	#endif
 	//
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	g = rhs.g;
 	#endif
 //
@@ -131,7 +131,7 @@ void Cell_2D::Factor()
 	f.setxBP();
 	#endif
 	//!energy
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	g.setxBP();
 	#endif
 }

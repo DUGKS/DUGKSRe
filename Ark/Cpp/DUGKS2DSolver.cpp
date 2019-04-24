@@ -116,6 +116,8 @@ void Forecast_DVDF_Tilde(Cell_2D &cell);
 
 void StrangSplitting_Source(Cell_2D &cell);
 
+void ZeroSource(Cell_2D &cell);
+
 void Update_DVDF_BP(Cell_2D& cell);
 
 void Update_DVDF_h(Face_2D& face);
@@ -165,9 +167,9 @@ void DUGKS2DSolver()
 {
 	step = 0;
 	Output_Flowfield(0.0,0);
-	Output_MidX(step);
-	Output_RTIlocation(0,1);
-	Output_RTIlocation(0,Nx/2);
+	// Output_MidX(step);
+	// Output_RTIlocation(0,1);
+	// Output_RTIlocation(0,Nx/2);
 	//
 	printSplitLine();
 	cout << "iteration start    ThreadNum : "<<ThreadNum<<endl;
@@ -188,6 +190,7 @@ void DUGKS2DSolver()
 	LoopPS(Cells)
 	{
 		StrangSplitting_Source(CellArray[n]);
+		ZeroSource(CellArray[n]);
 	}
 	#endif
 	//
@@ -258,9 +261,9 @@ void DUGKS2DSolver()
 		}
 		#ifdef _PERIODIC_12_8_BCs_FLIP
 		#pragma omp for schedule(guided)
-		for(int k = 0;k < PeriodicFaceNum;++k)
+		LoopPSB(PeriodicFaceNum)
 		{
-			Flux_2D(*PeriodicFaceA[k]);
+			Flux_2D(*PeriodicFaceA[nB]);
 		}
 		#endif
 	#endif
@@ -309,7 +312,7 @@ void DUGKS2DSolver()
 	// {
 	// startC = std::chrono::system_clock::now();
 	// }
-//--------------------auxilary DDF : phi tilde----------------------------
+//--------------------auxilary DDF : DVDF tilde----------------------------
 	#pragma omp for schedule(guided)
 	LoopPS(Cells)
 		Update_DVDF_Tilde(CellArray[n]);
@@ -360,8 +363,8 @@ void DUGKS2DSolver()
 		{
 			Update_SumRho(step);
 			//Update_SumEk(step);
-			Output_RTIlocation(step,1);
-			Output_RTIlocation(step,Nx/2);
+			// Output_RTIlocation(step,1);
+			// Output_RTIlocation(step,Nx/2);
 			#ifdef _OUTPUT_L2NORM_ERROR_FLIP
 			UpdateL2Error(step);
 			#endif
@@ -373,7 +376,10 @@ void DUGKS2DSolver()
 	}
   }
 }
+	#ifdef _ARK_THERMAL_FLIP
 	IntegralShearStress();
+	#endif
+
 	Output_Flowfield((step)*::dt,step);
 	// Output_Diag(step);
 	// Output_MidX(step);
@@ -397,9 +403,21 @@ void Zero_GradBarPlus(Cell_2D &cell)
 		cell.f.BarP_y[k] = 0.0;
 		#endif
 //isothermal flip
-		#ifndef _ARK_ISOTHERMAL_FLIP
+		#ifdef _ARK_THERMAL_FLIP
 		cell.g.BarP_x[k] = 0.0;
 		cell.g.BarP_y[k] = 0.0;
+		#endif
+	}
+}
+void ZeroSource(Cell_2D &cell)
+{
+	cell.MsQ().Fx = 0.0;
+	cell.MsQ().Fy = 0.0;
+
+	LoopVS(Q)
+	{
+		#ifdef _ARK_MOMENTUM_FLIP
+		cell.f.So[k] = 0.0;
 		#endif
 	}
 }
@@ -443,7 +461,7 @@ void Update_DVDF_BP(Cell_2D& cell)
 						+ cell.f.cBP*cell.f.So[k];
 		#endif
 		//isothermal flip
-		#ifndef _ARK_ISOTHERMAL_FLIP
+		#ifdef _ARK_THERMAL_FLIP
 		cell.g.BarP[k] = cell.g.aBP*cell.g.Tilde[k] + cell.g.bBP*cell.g.Eq[k];
 		#endif
 	}
@@ -462,7 +480,7 @@ void Update_DVDF_h(Face_2D& face)
 						+ face.f.ch*face.f.SohDt[k];
 		#endif
 		//isothermal flip
-		#ifndef _ARK_ISOTHERMAL_FLIP
+		#ifdef _ARK_THERMAL_FLIP
 		face.g.hDt[k] = face.g.ah*face.g.BhDt[k] + face.g.bh*face.g.EqhDt[k];
 		#endif
 	}
@@ -479,7 +497,7 @@ void Update_DVDF_Flux_h(Face_2D &face)
 		face.f.hDt[k] *= face.xi_n_dS[k];
 		#endif
 		//isothermal flip
-		#ifndef _ARK_ISOTHERMAL_FLIP
+		#ifdef _ARK_THERMAL_FLIP
 		face.g.hDt[k] *= face.xi_n_dS[k];
 		#endif
 	}
@@ -492,14 +510,14 @@ double VenkatakrishnanExpression(double a,double b)
 void VenkatakrishnanFluxLimiter(Cell_2D &cell,int const k)
 {
 	#ifdef _ARK_MOMENTUM_FLIP
-	double GradfBPDotDelta[4],LfBP[4];
+	double GradfBPDotDelta[4] = {0},LfBP[4] = {0};
 	double MaxfBP = cell.f.BarP[k],MinfBP = cell.f.BarP[k];
 	double MinfBPLimiter = 1;
 	#endif
 //
 	// double MaxfBP = -1E+5,MinfBP = -MaxfBP, MaxgBP = -1E+5,MingBP = -MaxgBP;
-	#ifndef _ARK_ISOTHERMAL_FLIP
-	double GradgBPDotDelta[4],LgBP[4];
+	#ifdef _ARK_THERMAL_FLIP
+	double GradgBPDotDelta[4] = {0},LgBP[4] = {0};
 	double MaxgBP = cell.g.BarP[k],MingBP = cell.g.BarP[k];
 	double MingBPLimiter = 1;
 	#endif
@@ -514,7 +532,7 @@ void VenkatakrishnanFluxLimiter(Cell_2D &cell,int const k)
 			MinfBP = cell.Cell_C[iFace]->f.BarP[k];
 		#endif
 		//isothermal
-		#ifndef _ARK_ISOTHERMAL_FLIP
+		#ifdef _ARK_THERMAL_FLIP
 		if(cell.Cell_C[iFace]->g.BarP[k] > MaxgBP)
 			MaxgBP = cell.Cell_C[iFace]->g.BarP[k];
 		if(cell.Cell_C[iFace]->g.BarP[k] < MingBP)
@@ -543,7 +561,7 @@ void VenkatakrishnanFluxLimiter(Cell_2D &cell,int const k)
 			LfBP[iFace] = 1;
 		#endif
 		//isothermal
-		#ifndef _ARK_ISOTHERMAL_FLIP
+		#ifdef _ARK_THERMAL_FLIP
 		GradgBPDotDelta[iFace] = (cell.Face_C[iFace]->xf - cell.xc)*cell.g.BarP_x[k]
 						        + (cell.Face_C[iFace]->yf - cell.yc)*cell.g.BarP_y[k];
 		if(GradgBPDotDelta[iFace] > 0)
@@ -569,7 +587,7 @@ void VenkatakrishnanFluxLimiter(Cell_2D &cell,int const k)
 		if(LfBP[iFace] < MinfBPLimiter) MinfBPLimiter = LfBP[iFace];
 		#endif
 		//isothermal
-		#ifndef _ARK_ISOTHERMAL_FLIP
+		#ifdef _ARK_THERMAL_FLIP
 		if(LgBP[iFace] < MingBPLimiter) MingBPLimiter = LgBP[iFace];
 		#endif
 	}
@@ -578,7 +596,7 @@ void VenkatakrishnanFluxLimiter(Cell_2D &cell,int const k)
 	cell.fBPLimiter = MinfBPLimiter;
 	#endif
 	//isothermal
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	cell.gBPLimiter = MingBPLimiter;
 	#endif
 }
@@ -597,7 +615,7 @@ void UW_Interior_DVDF_Bh_Limiter(Face_2D& face,Cell_2D* ptr_C,int const k)
 	               + ptr_C->fBPLimiter*(dx*ptr_C->f.BarP_x[k] + dy*ptr_C->f.BarP_y[k]);
 	#endif
 	//isothermal flip
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	face.g.BhDt[k] = ptr_C->g.BarP[k]
 				   + ptr_C->gBPLimiter*(dx*ptr_C->g.BarP_x[k] + dy*ptr_C->g.BarP_y[k]);
 	#endif
@@ -617,7 +635,7 @@ void UW_Interior_DVDF_Bh(Face_2D& face,Cell_2D* ptr_C,int const k)
 					  + (dx*ptr_C->f.BarP_x[k] + dy*ptr_C->f.BarP_y[k]);
 	#endif
 	//isothermal flip
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	face.g.BhDt[k] = ptr_C->g.BarP[k]
 					  + (dx*ptr_C->g.BarP_x[k] + dy*ptr_C->g.BarP_y[k]);
 	#endif
@@ -642,7 +660,7 @@ void UW_Interior_DVDF_Bh(Face_2D& face,int const k)
 	// face.f.BhDt[k] = 0.5*(face.owner->f.BarP[k]+face.neigh->f.BarP[k]);
 	#endif
 	//isothermal flip
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	face.g.BhDt[k] = 0.5*(face.owner->g.BarP[k] + face.neigh->g.BarP[k]);
 	#endif
 }
@@ -656,7 +674,7 @@ void CD_Interior_DVDF_Bh(Face_2D &face,int const k)
 	double _fBP_xF = 1000,_fBP_yF = 1000;
 	#endif
 	//!isothermal
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	double _gBP_xF = 1000,_gBP_yF = 1000;
 	#endif
 	//!central difference
@@ -678,7 +696,7 @@ void CD_Interior_DVDF_Bh(Face_2D &face,int const k)
 		_fBP_yF = (face.owner->f.BarP[k] - face.neigh->f.BarP[k])/face._dy;
 		#endif
 		//!isothemal
-		#ifndef _ARK_ISOTHERMAL_FLIP
+		#ifdef _ARK_THERMAL_FLIP
 		//_gBP_xF =  0.5*(face.owner->g.BarP_x[k] + face.neigh->g.BarP_x[k]);
 		_gBP_xF = (0.5*(face.faceCells[3]->g.BarP[k] - face.faceCells[1]->g.BarP[k])
 				+ 0.5*(face.faceCells[2]->g.BarP[k] - face.faceCells[0]->g.BarP[k]))
@@ -704,7 +722,7 @@ void CD_Interior_DVDF_Bh(Face_2D &face,int const k)
 		_fBP_xF = (face.owner->f.BarP[k] - face.neigh->f.BarP[k])/face._dx;
 		#endif
 		//
-		#ifndef _ARK_ISOTHERMAL_FLIP
+		#ifdef _ARK_THERMAL_FLIP
 		_gBP_yF = (0.5*(face.faceCells[3]->g.BarP[k] - face.faceCells[1]->g.BarP[k])
 				+ 0.5*(face.faceCells[2]->g.BarP[k] - face.faceCells[0]->g.BarP[k]))
 				/face._dy;
@@ -726,7 +744,7 @@ void CD_Interior_DVDF_Bh(Face_2D &face,int const k)
 			- hDt*(_fBP_xF*xi_u[k] + _fBP_yF*xi_v[k]);
 	#endif
 	//!isothemal
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	face.g.BhDt[k] = 0.5*(face.owner->g.BarP[k] + face.neigh->g.BarP[k])
 			- hDt*(_gBP_xF*xi_u[k] + _gBP_yF*xi_v[k]);
 	#endif	
@@ -778,9 +796,6 @@ void Flux_2D(Face_2D &face)
 	Update_DVDF_Bh(face);
 	Update_MacroVar_h(face);
 	Update_DVDF_Eqh(face);
-	// #ifdef _ARK_FORCE_FLIP
-	// Update_DVDF_Source_h(face);
-	// #endif
 	Update_DVDF_h(face);
 }
 //-------------------------------------------------------------------------------
@@ -796,7 +811,7 @@ void Update_DVDF_Tilde(Cell_2D &cell)
 		double fFluxSum = 0;
 		#endif
 		//isothermal flip
-		#ifndef _ARK_ISOTHERMAL_FLIP
+		#ifdef _ARK_THERMAL_FLIP
 		gFluxSum = 0;
 		#endif
 		for(int iF = 0;iF < cell.celltype;++iF)
@@ -809,7 +824,7 @@ void Update_DVDF_Tilde(Cell_2D &cell)
 			fFluxSum += cell.signFlux[iF]*cell.Face_C[iF]->f.hDt[k];
 			#endif
 			//isothermal flip
-			#ifndef _ARK_ISOTHERMAL_FLIP
+			#ifdef _ARK_THERMAL_FLIP
 			gFluxSum += cell.signFlux[iF]*cell.Face_C[iF]->g.hDt[k];
 			#endif
 		}
@@ -823,7 +838,7 @@ void Update_DVDF_Tilde(Cell_2D &cell)
 							+ cell.DtSlashVolume*fFluxSum;
 		#endif
 //isothermal flip
-		#ifndef _ARK_ISOTHERMAL_FLIP
+		#ifdef _ARK_THERMAL_FLIP
 		cell.g.Tilde[k] = aTP*cell.g.BarP[k] - bTP*cell.g.Tilde[k]
 							+ cell.DtSlashVolume*gFluxSum;
 		#endif
@@ -836,7 +851,7 @@ void Update_SumRho(int step)
 	LoopPS(Cells)
 	{
 		::SumRho += CellArray[n].MsQ().Phi;
-		#ifndef _ARK_ISOTHERMAL_FLIP 
+		#ifdef _ARK_THERMAL_FLIP 
 		::SumT += CellArray[n].MsQ().T;
 		#endif
 	}

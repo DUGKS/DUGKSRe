@@ -3,7 +3,7 @@
 *|||||||||||used for initialization;*|||||||||||*
 *------------------------------------------------
 */
-//UniformFlow();
+// UniformFlow();
 //LidDrivenSquare();
 //ShockStructure();
 //Riemann2D();
@@ -12,7 +12,7 @@
 //unsteadyTaylorGreen();
 //TaylorCouetteInitialization();
 //ForceDrivenTG();
-//SCMP_Drop();
+SCMP_Drop();
 //SCMP_FlatInterface();
 //AC_Drop();
 // AC_SpinodalDecomposition();
@@ -23,4 +23,4 @@
 // AC_RisingBubble();
 // AC_LayeredPoiseuille();
 // AC_RayleighTaylor();
-RBFTestFunc();
+// RBFTestFunc();

@@ -127,61 +127,57 @@ extern double RBFTestAnalytic(double const x,double const y);
 extern Cell_2D const* targetCell(Cell_2D const *const cellptr);
 void RBFPrecisionTest()
 {
-	LoopPS(Cells)
-	{
-		Cell_2D &cell = CellArray[n];
-		SetwRBF(&cell,&Cell_2D::h,5);
-	}
-	LoopPS(Faces)
-	{
-		Face_2D &face = FaceArray[n];
-		double 
-		dxOwner = face.xf - face.owner->xc,
-		dyOwner = face.yf - face.owner->yc,
-		dxNeigh = face.xf - face.neigh->xc,
-		dyNeigh = face.yf - face.neigh->yc;
+// 	LoopPS(Cells)
+// 	{
+// 		Cell_2D &cell = CellArray[n];
+// 		SetwRBF(&cell,&Cell_2D::h,5);
+// 	}
+// 	LoopPS(Faces)
+// 	{
+// 		Face_2D &face = FaceArray[n];
+// 		double 
+// 		dxOwner = face.xf - face.owner->xc,
+// 		dyOwner = face.yf - face.owner->yc,
+// 		dxNeigh = face.xf - face.neigh->xc,
+// 		dyNeigh = face.yf - face.neigh->yc;
 
-		Cell_2D const *neigh = targetCell(face.neigh);
-		face.h.hDt[5] = 0.0;
+// 		Cell_2D const *neigh = targetCell(face.neigh);
+// 		face.h.hDt[5] = 0.0;
 
-		face.h.hDt[5] += valueRBF(face.owner,dxOwner,dyOwner);
-		face.h.hDt[5] += valueRBF(neigh,dxNeigh,dyNeigh);
-		face.h.hDt[5] /= 2;
-	}
-	// LoopPS(Faces)
-	// {
-	// 	Face_2D &face = FaceArray[n];
-	// 	Info << (RBFTestAnalytic(face.xf,face.yf))<<fs;
-	// 	cout << (face.h.hDt[5])<<fs;
-	// 	cout << face.xf << fs << face.yf<<endl;
-	// }
-	// LoopPS(Cells)
-	// {
-	// 	Cell_2D &cell = CellArray[n];
-	// 	double tmpAN = cell.Cell_C[3]->MsQ().Rho - valueRBF(&cell,0,-::dy);
-	// 	if(fabs(tmpAN) > ::infinitesimal)
-	// 	Info << tmpAN<<endl;
-	// }
-	double ErrorLmax = 0.0,Errortmp = 0.0;
-	double ErrorL2 = 0.0, dVar = 0.0,sumVar = 0.0,sumdVar = 0.0;
-	LoopPS(Faces)
-	{
-	if(FaceArray[n].shadowF == nullptr)
-	{
+// 		face.h.hDt[5] += valueRBF(face.owner,dxOwner,dyOwner);
+// 		face.h.hDt[5] += valueRBF(neigh,dxNeigh,dyNeigh);
+// 		face.h.hDt[5] /= 2;
+// 	}
+// 	// LoopPS(Faces)
+// 	// {
+// 	// 	Face_2D &face = FaceArray[n];
+// 	// 	Info << (RBFTestAnalytic(face.xf,face.yf))<<fs;
+// 	// 	cout << (face.h.hDt[5])<<fs;
+// 	// 	cout << face.xf << fs << face.yf<<endl;
+// 	// }
+// 	// LoopPS(Cells)
+// 	// {
+// 	// 	Cell_2D &cell = CellArray[n];
+// 	// 	double tmpAN = cell.Cell_C[3]->MsQ().Rho - valueRBF(&cell,0,-::dy);
+// 	// 	if(fabs(tmpAN) > ::infinitesimal)
+// 	// 	Info << tmpAN<<endl;
+// 	// }
+// 	double ErrorLmax = 0.0,Errortmp = 0.0;
+// 	double ErrorL2 = 0.0, dVar = 0.0,sumVar = 0.0,sumdVar = 0.0;
+// 	LoopPS(Faces)
+// 	{
+// 		Face_2D &face = FaceArray[n];
 
-		Face_2D &face = FaceArray[n];
+// 		Errortmp = fabs(face.h.hDt[5] - RBFTestAnalytic(face.xf,face.yf));
+// 		if(Errortmp > ErrorLmax)
+// 			ErrorLmax = Errortmp;
 
-		Errortmp = fabs(face.h.hDt[5] - RBFTestAnalytic(face.xf,face.yf));
-		if(Errortmp > ErrorLmax)
-			ErrorLmax = Errortmp;
-
-		dVar = fabs(face.h.hDt[5] - RBFTestAnalytic(face.xf,face.yf));
-		sumdVar += dVar*dVar;
-		sumVar += RBFTestAnalytic(face.xf,face.yf)*RBFTestAnalytic(face.xf,face.yf);
-	}
-	}
-	ErrorL2 = sqrt(sumdVar/(sumVar+1e-30));
-	Info << "ErrorL2 : "<<ErrorL2 << endl;
-	Info << "ErrorLmax : "<<ErrorLmax << endl;
-	Output_Flowfield((step)*::dt,step);
+// 		dVar = fabs(face.h.hDt[5] - RBFTestAnalytic(face.xf,face.yf));
+// 		sumdVar += dVar*dVar;
+// 		sumVar += RBFTestAnalytic(face.xf,face.yf)*RBFTestAnalytic(face.xf,face.yf);
+// 	}
+// 	ErrorL2 = sqrt(sumdVar/(sumVar+1e-30));
+// 	Info << "ErrorL2 : "<<ErrorL2 << endl;
+// 	Info << "ErrorLmax : "<<ErrorLmax << endl;
+// 	Output_Flowfield((step)*::dt,step);
 }

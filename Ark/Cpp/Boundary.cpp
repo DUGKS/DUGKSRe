@@ -13,7 +13,7 @@ void P_Inlet_4_Boundary()
 		P_InletShadowCA[nB].f.BarP[k] = P_InletShadowCA[nB].Cell_C[0]->f.BarP[k];
 		#endif
 		//isothermal flip
-		#ifndef _ARK_ISOTHERMAL_FLIP
+		#ifdef _ARK_THERMAL_FLIP
 		P_InletShadowCA[nB].g.BarP[k] = P_InletShadowCA[nB].Cell_C[0]->g.BarP[k];
 		#endif
 	}
@@ -28,7 +28,7 @@ void P_Outlet_5_Boundary()
 		P_OutletShadowCA[nB].f.BarP[k] = P_OutletShadowCA[nB].Cell_C[0]->f.BarP[k];
 		#endif
 	//isothermal flip
-		#ifndef _ARK_ISOTHERMAL_FLIP
+		#ifdef _ARK_THERMAL_FLIP
 		P_OutletShadowCA[nB].g.BarP[k] = P_OutletShadowCA[nB].Cell_C[0]->g.BarP[k];
 		#endif
 	}
@@ -55,7 +55,7 @@ void ExtrapolationfBP(Cell_2D *shadowCell,Cell_2D const *neighb,Cell_2D const *n
 		shadowCell->f.BarP[k] = 2*neighb->f.BarP[k] - nextNeighb->f.BarP[k];
 		#endif
 		//
-		#ifndef _ARK_ISOTHERMAL_FLIP
+		#ifdef _ARK_THERMAL_FLIP
 		shadowCell->g.BarP[k] = 2*neighb->g.BarP[k] - nextNeighb->g.BarP[k];
 		#endif
 	}
@@ -101,7 +101,7 @@ void WallShadowC_fBP(Cell_2D &shadowCell)
 		+ cell->f.aBP*(cell->f.Tilde[k] - cell->f.Eq[k] + ::hDt*cell.f.So[k]);
 		#endif
 		//isothermal flip
-		#ifndef _ARK_ISOTHERMAL_FLIP	
+		#ifdef _ARK_THERMAL_FLIP	
 		shadowCell.g.BarP[k] = shadowCell.g.Eq[k]
 		+ cell->g.aBP*(cell->g.Tilde[k] - cell->g.Eq[k] + ::hDt*cell.g.So[k]);
 		#endif
@@ -126,7 +126,7 @@ void Wall_3_BB(Face_2D &face)
 			face.f.hDt[k] = face.f.hDt[k_BB];
 			#endif
 			//!isothemal
-			#ifndef _ARK_ISOTHERMAL_FLIP
+			#ifdef _ARK_THERMAL_FLIP
 			face.g.hDt[k] = face.g.hDt[k_BB];
 			#endif
 		}
@@ -154,7 +154,7 @@ void Wall_3_NEE(Face_2D &face)
 	double fNEq = 2.0*cell.f.tau/(2.0*cell.f.tau + ::dt);
 	#endif
 	//
-	#ifndef _ARK_ISOTHERMAL_FLIP	
+	#ifdef _ARK_THERMAL_FLIP	
 	double gNEq = 2.0*cell.g.tau/(2.0*cell.g.tau + ::dt);
 	#endif
 	//
@@ -170,7 +170,7 @@ void Wall_3_NEE(Face_2D &face)
 		+ fNEq*(cell.f.Tilde[k] - cell.f.Eq[k] + hDt*cell.f.So[k]);
 		#endif
 	//isothermal flip
-		#ifndef _ARK_ISOTHERMAL_FLIP	
+		#ifdef _ARK_THERMAL_FLIP	
 		face.g.hDt[k] = face.g.EqhDt[k]
 		+ gNEq*(cell.g.Tilde[k] - cell.gEq[k] + hDt*cell.g.So[k]);
 		#endif

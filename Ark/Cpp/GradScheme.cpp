@@ -30,7 +30,7 @@ void Grad_VS_4points(Cell_2D *cellptr)
 	update_DVDF_Grad4points(cellptr,&Cell_2D::f);
 	#endif
 	//
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	update_DVDF_Grad4points(cellptr,&Cell_2D::g);
 	#endif
 }
@@ -44,7 +44,7 @@ void Grad_VS_6points(Cell_2D *cellptr)
 	update_DVDF_Grad6points(cellptr,&Cell_2D::f);
 	#endif
 	//
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	update_DVDF_Grad6points(cellptr,&Cell_2D::g);
 	#endif
 }
@@ -58,7 +58,7 @@ void Grad_VS_LS(Cell_2D *center)
 	update_DVDF_Grad_LS(center,&Cell_2D::f);
 	#endif
 	//
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	update_DVDF_Grad_LS(center,&Cell_2D::g);
 	#endif
 }
@@ -71,14 +71,14 @@ void update_Psi_y(Cell_2D *cellptr)
 {
 	cellptr->msq->Fy = update_MQ_y(cellptr,&MacroQuantity::Psi);
 }
-void update_Psi_x(Face_2D *faceptr)
-{
-	faceptr->msqh->Fx = update_MQ_x(faceptr,&MacroQuantity::Psi);
-}
-void update_Psi_y(Face_2D *faceptr)
-{
-	faceptr->msqh->Fy = update_MQ_y(faceptr,&MacroQuantity::Psi);
-}
+// void update_Psi_x(Face_2D *faceptr)
+// {
+// 	faceptr->msqh->Fx = update_MQ_x(faceptr,&MacroQuantity::Psi);
+// }
+// void update_Psi_y(Face_2D *faceptr)
+// {
+// 	faceptr->msqh->Fy = update_MQ_y(faceptr,&MacroQuantity::Psi);
+// }
 //!
 void update_Phi_x(Cell_2D *cellptr)
 {  

@@ -124,8 +124,8 @@ int main()
 	OutputCase();
 //------------------Solve-------------------
 	#ifndef _ZERO_NDEBUG_FLIP
-	//DUGKS2DSolver();
-	RBFPrecisionTest();
+	DUGKS2DSolver();
+	// RBFPrecisionTest();
 	#endif
 //------------------Afterprocess----------------
 	#ifdef _ZERO_NDEBUG_FLIP

@@ -89,7 +89,7 @@ void OutputCase()
 				 // <<top<<fs<<"="<<fs<<"top"<<endl
 				 // <<bottom<<fs<<"="<<fs<<"bottom"<<endl
 				 <<"#-------------------------------------------"<<endl<<endl
-				 #ifndef _ARK_ISOTHERMAL_FLIP
+				 #ifdef _ARK_THERMAL_FLIP
 				 <<"#--------------thermodynamics------------"<<endl
 				 <<Omega0<<"    =    Omega0//sutherland power"<<endl
 				 <<Pr<<"    =    Prandtl"<<endl
@@ -153,8 +153,9 @@ void OutputCase()
 				 <<PhaseFieldAC::MuL/PhaseFieldAC::MuV<<"    =    "<<"dynamic viscosity ratio"<<endl
 				 <<PhaseFieldAC::radius/ChLength<<"    =    radius"<<endl
 				 <<_ARK_LAPLACIAN_SCHEME<<"    =    laplacian operator"<<endl
-				 <<"#-------------------------------------------"<<endl<<endl;
+				 <<"#-------------------------------------------"<<endl
 				 #endif
+				 <<"#---------------------END--------------------"<<endl<<endl;
 	OutFile_Case.close();
 //
 }
@@ -303,7 +304,6 @@ void Output_SumEk(double t)
 double locateInterface(int const X,int &Facek, int &anotherFacek)
 {
 	double dPhi = 1;
-	double position = 0.0;
 
 	for(int k = 1;k < Nyp1;++k)
 	{
@@ -506,7 +506,7 @@ void Output_MidX_reverse(int step)
 {
 	using PhaseFieldAC::RhoL;
 	using PhaseFieldAC::RhoV;
-	int const midX = Nx/2;
+	// int const midX = Nx/2;
 	//int const mid = 1;
 	ostringstream oss_MidX;
 	oss_MidX <<"../FlowField/Convergence/"<<"MidXreverse_"<<"Ma"<< Ma<<"_"
@@ -725,6 +725,11 @@ void Output_Flowfield(double const &t,int step)
 		}
 		OutFile_FlowField<<"))"<<endl;
 }
+/* q<sub>x</sub>,q<sub>y</sub>,\
+ <Greek>t</Greek><sub>xx</sub>,<Greek>t</Greek><sub>xy</sub>,\
+ <Greek>t</Greek><sub>yy</sub>,
+*/
+//
 // void Output_Flowfield(double const &t,int step)
 // {
 // 	ostringstream oss_FlowField;
@@ -738,14 +743,13 @@ void Output_Flowfield(double const &t,int step)
 // 		getchar();
 // 		return;
 // 	}
-// /*	q<sub>x</sub>,q<sub>y</sub>,\
-// 	<Greek>t</Greek><sub>xx</sub>,<Greek>t</Greek><sub>xy</sub>,<Greek>t</Greek><sub>yy</sub>,
-// */
 // 	ostringstream VarName,VarLocation,ZoneName,dataNE;
+/*
 // 	VarName << "VARIABLES = X,Y,<Greek>r</Greek>,U,V,p,T,\
 // 	<Greek>f</Greek>,\
 // 	<Greek>f</Greek><sub>x</sub>,<Greek>f</Greek><sub>y</sub>,\
 // 	Fx,Fy\n";
+*/
 // 	VarLocation <<"VarLocation=([1-2]=NODAL,[3-12]=CellCentered)\n";
 // 	ZoneName<<"ZONE T = Time" << t <<"_"<<"Mu"<<Mu0<<"\n";
 // 	dataNE<<"Nodes="<<Nodes<<", Elements="<<Cells<<", ZONETYPE=FEQuadrilateral\n";

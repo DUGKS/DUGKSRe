@@ -50,7 +50,7 @@ void Update_phi_Eq(Cell_2D &cell)
 		double cx = xi_u[i] - cell.U, cy = xi_v[j] - cell.V;
 		double c2 = cx*cx + cy*cy;
 		double aEq = exp(-cell.Lambda*c2)/PI;
-#ifndef _ARK_ISOTHERMAL_FLIP
+#ifdef _ARK_THERMAL_FLIP
 		double CQ = (1.0-Pr)*cell.Lambda*cell.Lambda*(cx*cell.qx+cy*cell.qy);
 		cell.f.Eq[i][j] = (1.6*(cell.Lambda*c2-2.0)*CQ + cell.Rho)*cell.Lambda*aEq;
 		cell.gEq[i][j] = (0.8*((cell.Lambda*c2-1.0)*(nK+1.0)-nK)*CQ + agEq*cell.Rho)*aEq;
@@ -68,7 +68,7 @@ void Update_phi_Eqh(Face_2D &face)
 		double cx = xi_u[i] - face.U_h, cy = xi_v[j] - face.V_h;
 		double c2 = cx*cx + cy*cy;
 		double aEq = exp(-face.Lambda_h*c2)/PI;
-#ifndef _ARK_ISOTHERMAL_FLIP
+#ifdef _ARK_THERMAL_FLIP
 		double CQ = (1.0-Pr)*face.Lambda_h*face.Lambda_h*(cx*face.qx_h + cy*face.qy_h);
 		face.fEqh[i][j] = (1.6*(face.Lambda_h*c2-2.0)*CQ + face.Rho_h)*face.Lambda_h*aEq;
 		face.gEqh[i][j] = (0.8*((face.Lambda_h*c2-1.0)*(nK+1.0)-nK)*CQ + agEq*face.Rho_h)*aEq;
@@ -92,7 +92,7 @@ void Update_MacroVar_h(Face_2D& face)
 	face.Rho_h = IntegralGH(Int_fBh_du,DV_Qu,wGH);
 	face.U_h   = IntegralGH(Int_fBh_du,DV_Qu,xi_u,wGH)/face.Rho_h;
 	face.V_h   = IntegralGH(Int_fBh_dv,DV_Qv,xi_v,wGH)/face.Rho_h;
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	double aQh = face.tauh/(2.0*face.tauh + ::hDt*Pr);;
 	for(int i = 0;i < DV_Qu;++i)		
 	{
@@ -149,7 +149,7 @@ void Update_MacroVar(Cell_2D& cell)
 	cell.U   = IntegralGH(Int_fT_du,DV_Qu,xi_u,wGH)/cell.Rho;
 	cell.V   = IntegralGH(Int_fT_dv,DV_Qv,xi_v,wGH)/cell.Rho;
 	cell.p    = 0.5*(cell.Rho - Rho0)/Lambda0;
-#ifndef _ARK_ISOTHERMAL_FLIP
+#ifdef _ARK_THERMAL_FLIP
 	double aQ = cell.f.tau/(2.0*cell.f.tau + dt*Pr);
 	for(int i = 0;i < DV_Qu;++i)		
 	{
@@ -233,7 +233,7 @@ void Update_phi_Eqh(Face_2D &face,int i,int j)
 	double aEq = exp(-face.Lambda_h*c2)/PI;
 	face.fEqh[i][j] = face.Rho_h*face.Lambda_h*aEq;
 //isothermal flip
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	face.gEqh[i][j] = agEq*face.Rho_h*aEq;
 	#endif
 }
@@ -241,7 +241,7 @@ void Update_phi_h(Face_2D& face,int i,int j)
 {
 	face.fh[i][j] = face.ah*face.fBh[i][j] + face.bh*face.fEqh[i][j];
 //isothermal flip
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	face.gh[i][j] = face.ah*face.gBh[i][j] + face.bh*face.gEqh[i][j];
 	#endif
 }
@@ -249,7 +249,7 @@ void Update_phiFlux_h(Face_2D &face,int i,int j)
 {
 	face.fh[i][j] *= face.xi_n_dS[i][j];
 //	isothermal flip
-	#ifndef _ARK_ISOTHERMAL_FLIP
+	#ifdef _ARK_THERMAL_FLIP
 	face.gh[i][j] *= face.xi_n_dS[i][j];
 	#endif
 }
@@ -281,7 +281,7 @@ void Wall_3_DS(Face_2D &face)
 			Update_phi_Eqh(face,i,j);
 			face.fh[i][j] = face.fEqh[i][j];
 			//isothermal flip
-			#ifndef _ARK_ISOTHERMAL_FLIP
+			#ifdef _ARK_THERMAL_FLIP
 			face.gh[i][j] = face.gEqh[i][j];
 			#endif
 			Update_phiFlux_h(face,i,j);
@@ -298,7 +298,7 @@ void Wall_3_DS(Face_2D &face)
 			Update_phi_Eqh(face,i,j);
 			face.fh[i][j] = face.fEqh[i][j];
 			//isothermal flip
-			#ifndef _ARK_ISOTHERMAL_FLIP
+			#ifdef _ARK_THERMAL_FLIP
 			face.gh[i][j] = face.gEqh[i][j];
 			#endif
 			Update_phiFlux_h(face,i,j);
