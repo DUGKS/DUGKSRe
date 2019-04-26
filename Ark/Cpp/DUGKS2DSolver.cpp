@@ -11,7 +11,7 @@ using std::endl;
 
 double const aTP = 4.0/3.0, bTP = 1.0/3.0;
 
-int const ThreadNum = 1;//omp_get_max_threads();
+int const ThreadNum = omp_get_max_threads();
 
 double ResidualPer1k = 1.0;
 
@@ -58,15 +58,9 @@ extern void fluxCheck(Face_2D const* faceptr);
 
 //----------------------------------------------------------
 
-extern void Update_force(Cell_2D &cell);
-
-extern void Update_force_h(Face_2D &face);
-
 extern void MacroSource(Cell_2D *cellptr);
 
 extern void Update_PseudoForce(Cell_2D &cell);
-
-extern void Update_PseudoForce(Face_2D &face);
 
 extern void Output_xcyc();
 
@@ -99,8 +93,6 @@ extern void Output_g_hdt_Append(Face_2D &face,double dt);
 
 // extern void Output_gFlux_Append(Cell_2D &cell,double dt);
 
-extern void Output_phi_Bh(Face_2D &face,double t);
-
 #endif
 
 //-------------------------------------GradScheme.cpp---------------------------
@@ -111,6 +103,19 @@ extern void Grad_VS_LS(Cell_2D *center);
 extern void Grad_VS_6points(Cell_2D *center);
 
 extern void Grad_VS_4points(Cell_2D *center);
+
+//---------------------------------FluxConstruction.cpp-------------------------
+extern void UW_Interior_DVDF_Bh_Limiter(Face_2D& face,Cell_2D* ptr_C,int const k);
+
+extern void UW_Interior_DVDF_Bh(Face_2D& face,Cell_2D const* ptr_C,int const k);
+
+extern void UW_Interior_DVDF_Bh(Face_2D& face,int const k);
+
+extern void RBF_Interior_DVDF_Bh(Face_2D& face,Cell_2D* ptr_C,int const k);
+
+extern void RBF_Interior_DVDF_Bh(Face_2D& face,int const k);
+
+extern void CD_Interior_DVDF_Bh(Face_2D &face,int const k);
 //------------------------------------------------------------------------------
 void Forecast_DVDF_Tilde(Cell_2D &cell);
 
@@ -194,25 +199,12 @@ void DUGKS2DSolver()
 	}
 	#endif
 	//
-	// #pragma omp single
-	// if(step%10 == 0)
-	// {
-	// startA = std::chrono::system_clock::now();
-	// }
 	#pragma omp for schedule(guided)
 	LoopPS(Cells)
 	{
 		Update_DVDF_Eq(CellArray[n]);
 		Update_DVDF_BP(CellArray[n]);
 	}
-	// #pragma omp single
-	// if(step%10 == 0)
-	// {
-	// endA = std::chrono::system_clock::now();
-	// cout <<step<<fs<<"update_BarPlus"<<fs
-	// <<std::chrono::duration_cast<std::chrono::milliseconds>(endA-startA).count()
-	// <<'\n';
-	// }
 //-------------------Update-shadow fBP--------------------------------
 	#ifdef _Wall_3_BCs_FLIP
 	#pragma omp for schedule(guided)
@@ -230,19 +222,14 @@ void DUGKS2DSolver()
 	#pragma omp for schedule(guided)
 	LoopPS(Cells)
 	{
-		//Grad_VS_LS(&CellArray[n]);
-		Grad_VS_6points(&CellArray[n]);
-		//Grad_VS_4points(&CellArray[n]);
-		//Zero_GradBarPlus(CellArray[n]);
+		// Grad_VS_LS(&CellArray[n]);
+		// Grad_VS_6points(&CellArray[n]);
+		// Grad_VS_4points(&CellArray[n]);
+		// Zero_GradBarPlus(CellArray[n]);
 	}
 	#endif
 //-------------------------------Flux-------------------------------------
 //-------------------------------Interior Face-----------------------------
-	// #pragma omp single
-	// if(step%10 == 0)
-	// {
-	// startB = std::chrono::system_clock::now();
-	// }
 
 	#ifdef _ARK_LIMITER_FLIP
 		#pragma omp for schedule(guided)
@@ -286,15 +273,6 @@ void DUGKS2DSolver()
 			#endif
 		}
 	#endif
-// 
-	// #pragma omp single
-	// if(step%10 == 0)
-	// {
-	// endB = std::chrono::system_clock::now();
-	// cout <<step<<fs<<"update_Flux"<<fs
-	// <<std::chrono::duration_cast<std::chrono::milliseconds>(endB-startB).count()
-	// <<'\n';
-	// }
 
 	#pragma omp for schedule(guided) 
 	LoopPS(Faces)
@@ -306,12 +284,6 @@ void DUGKS2DSolver()
 	{
 		fluxCheck(WallFaceA[n]);
 	}
-
-	// #pragma omp single
-	// if(step%10 == 0)
-	// {
-	// startC = std::chrono::system_clock::now();
-	// }
 //--------------------auxilary DDF : DVDF tilde----------------------------
 	#pragma omp for schedule(guided)
 	LoopPS(Cells)
@@ -346,16 +318,6 @@ void DUGKS2DSolver()
 	}
 	#endif
 
-	// #pragma omp single
-	// if(step%10 == 0)
-	// {
-	// endC = std::chrono::system_clock::now();
-	// cout <<step<<fs<<"update_Tilde & MacroVars"<<fs
-	// <<std::chrono::duration_cast<std::chrono::milliseconds>(endC-startC).count()
-	// <<'\n';
-	// }
-
-	//
 	#pragma omp single
 	{
 		++step;
@@ -416,6 +378,10 @@ void ZeroSource(Cell_2D &cell)
 
 	LoopVS(Q)
 	{
+		#ifdef _ARK_ALLENCAHN_FLIP
+		cell.h.So[k] = 0.0;
+		#endif
+
 		#ifdef _ARK_MOMENTUM_FLIP
 		cell.f.So[k] = 0.0;
 		#endif
@@ -447,8 +413,6 @@ void StrangSplitting_Source(Cell_2D &cell)
 }
 void Update_DVDF_BP(Cell_2D& cell)
 {
-	// for(int i = 0;i < DV_Qu;++i)
-	// for(int j = 0;j < DV_Qv;++j)
 	LoopVS(Q)
 	{
 		#ifdef _ARK_ALLENCAHN_FLIP
@@ -460,7 +424,7 @@ void Update_DVDF_BP(Cell_2D& cell)
 		cell.f.BarP[k] = cell.f.aBP*cell.f.Tilde[k] + cell.f.bBP*cell.f.Eq[k]
 						+ cell.f.cBP*cell.f.So[k];
 		#endif
-		//isothermal flip
+		//thermal flip
 		#ifdef _ARK_THERMAL_FLIP
 		cell.g.BarP[k] = cell.g.aBP*cell.g.Tilde[k] + cell.g.bBP*cell.g.Eq[k];
 		#endif
@@ -502,285 +466,64 @@ void Update_DVDF_Flux_h(Face_2D &face)
 		#endif
 	}
 }
-inline
-double VenkatakrishnanExpression(double a,double b)
-{
-	return (a*a + 2*a*b + Kh3)/(a*a + 2*b*b + a*b + Kh3);
-} 
-void VenkatakrishnanFluxLimiter(Cell_2D &cell,int const k)
-{
-	#ifdef _ARK_MOMENTUM_FLIP
-	double GradfBPDotDelta[4] = {0},LfBP[4] = {0};
-	double MaxfBP = cell.f.BarP[k],MinfBP = cell.f.BarP[k];
-	double MinfBPLimiter = 1;
-	#endif
-//
-	// double MaxfBP = -1E+5,MinfBP = -MaxfBP, MaxgBP = -1E+5,MingBP = -MaxgBP;
-	#ifdef _ARK_THERMAL_FLIP
-	double GradgBPDotDelta[4] = {0},LgBP[4] = {0};
-	double MaxgBP = cell.g.BarP[k],MingBP = cell.g.BarP[k];
-	double MingBPLimiter = 1;
-	#endif
-//	
-	for(int iFace = 0;iFace < cell.celltype;++iFace)
-	{
-		//!momentum
-		#ifdef _ARK_MOMENTUM_FLIP
-		if(cell.Cell_C[iFace]->f.BarP[k] > MaxfBP)
-			MaxfBP = cell.Cell_C[iFace]->f.BarP[k];
-		if(cell.Cell_C[iFace]->f.BarP[k] < MinfBP)
-			MinfBP = cell.Cell_C[iFace]->f.BarP[k];
-		#endif
-		//isothermal
-		#ifdef _ARK_THERMAL_FLIP
-		if(cell.Cell_C[iFace]->g.BarP[k] > MaxgBP)
-			MaxgBP = cell.Cell_C[iFace]->g.BarP[k];
-		if(cell.Cell_C[iFace]->g.BarP[k] < MingBP)
-			MingBP = cell.Cell_C[iFace]->g.BarP[k];
-		#endif
-	}
-	for(int iFace = 0;iFace < cell.celltype;++iFace)
-	{
-		//!momentum
-		#ifdef _ARK_MOMENTUM_FLIP
-		GradfBPDotDelta[iFace] = (cell.Face_C[iFace]->xf - cell.xc)*cell.f.BarP_x[k]
-						        + (cell.Face_C[iFace]->yf - cell.yc)*cell.f.BarP_y[k];					        
-		if(GradfBPDotDelta[iFace] > 0)
-		{
-			LfBP[iFace]
-			=
-			VenkatakrishnanExpression(MaxfBP-cell.f.BarP[k],GradfBPDotDelta[iFace]);
-		}
-		else if(GradfBPDotDelta[iFace] < 0)
-		{
-			LfBP[iFace]
-			=
-			VenkatakrishnanExpression(MinfBP-cell.f.BarP[k],GradfBPDotDelta[iFace]);
-		}
-		else
-			LfBP[iFace] = 1;
-		#endif
-		//isothermal
-		#ifdef _ARK_THERMAL_FLIP
-		GradgBPDotDelta[iFace] = (cell.Face_C[iFace]->xf - cell.xc)*cell.g.BarP_x[k]
-						        + (cell.Face_C[iFace]->yf - cell.yc)*cell.g.BarP_y[k];
-		if(GradgBPDotDelta[iFace] > 0)
-		{
-			LgBP[iFace]
-			=  
-			VenkatakrishnanExpression(MaxgBP-cell.g.BarP[k],GradgBPDotDelta[iFace]);
-		}
-		else if(GradgBPDotDelta[iFace] < 0)
-		{
-			LgBP[iFace]
-			=
-			VenkatakrishnanExpression(MingBP-cell.g.BarP[k],GradgBPDotDelta[iFace]);
-		}
-		else
-			LgBP[iFace] = 1;
-		#endif
-	}
-	for(int iFace = 0;iFace < cell.celltype;++iFace)
-	{
-		//!momentum
-		#ifdef _ARK_MOMENTUM_FLIP
-		if(LfBP[iFace] < MinfBPLimiter) MinfBPLimiter = LfBP[iFace];
-		#endif
-		//isothermal
-		#ifdef _ARK_THERMAL_FLIP
-		if(LgBP[iFace] < MingBPLimiter) MingBPLimiter = LgBP[iFace];
-		#endif
-	}
-	//!momentum
-	#ifdef _ARK_MOMENTUM_FLIP
-	cell.fBPLimiter = MinfBPLimiter;
-	#endif
-	//isothermal
-	#ifdef _ARK_THERMAL_FLIP
-	cell.gBPLimiter = MingBPLimiter;
-	#endif
-}
-void UW_Interior_DVDF_Bh_Limiter(Face_2D& face,Cell_2D* ptr_C,int const k)
-{
-	double dx = face.xf - hDt*xi_u[k] - ptr_C->xc;
-	double dy = face.yf - hDt*xi_v[k] - ptr_C->yc;
-	VenkatakrishnanFluxLimiter(*ptr_C,k);
-	#ifdef _ARK_ALLENCAHN_FLIP
-	face.h.BhDt[k] = ptr_C->h.BarP[k]
-				   + (dx*ptr_C->h.BarP_x[k] + dy*ptr_C->h.BarP_y[k]);
-	#endif
-	//!momentum
-	#ifdef _ARK_MOMENTUM_FLIP
-	face.f.BhDt[k] = ptr_C->f.BarP[k]
-	               + ptr_C->fBPLimiter*(dx*ptr_C->f.BarP_x[k] + dy*ptr_C->f.BarP_y[k]);
-	#endif
-	//isothermal flip
-	#ifdef _ARK_THERMAL_FLIP
-	face.g.BhDt[k] = ptr_C->g.BarP[k]
-				   + ptr_C->gBPLimiter*(dx*ptr_C->g.BarP_x[k] + dy*ptr_C->g.BarP_y[k]);
-	#endif
-}
-void UW_Interior_DVDF_Bh(Face_2D& face,Cell_2D* ptr_C,int const k)
-{
-	double dx = face.xf - hDt*xi_u[k] - ptr_C->xc;
-	double dy = face.yf - hDt*xi_v[k] - ptr_C->yc;
-	//
-	#ifdef _ARK_ALLENCAHN_FLIP
-	face.h.BhDt[k] = ptr_C->h.BarP[k]
-					  + (dx*ptr_C->h.BarP_x[k] + dy*ptr_C->h.BarP_y[k]);
-	#endif
-	//!momentum
-	#ifdef _ARK_MOMENTUM_FLIP				  
-	face.f.BhDt[k] = ptr_C->f.BarP[k]
-					  + (dx*ptr_C->f.BarP_x[k] + dy*ptr_C->f.BarP_y[k]);
-	#endif
-	//isothermal flip
-	#ifdef _ARK_THERMAL_FLIP
-	face.g.BhDt[k] = ptr_C->g.BarP[k]
-					  + (dx*ptr_C->g.BarP_x[k] + dy*ptr_C->g.BarP_y[k]);
-	#endif
-}
-void UW_Interior_DVDF_Bh(Face_2D& face,int const k)
-{
-	Cell_2D const *ow = face.owner, *ne = face.neigh; 
-	double dxow = face.xf - hDt*xi_u[k] - ow->xc;
-	double dyow = face.yf - hDt*xi_v[k] - ow->yc;
 
-	double dxne = face.xf - hDt*xi_u[k] - ne->xc;
-	double dyne = face.yf - hDt*xi_v[k] - ne->yc;
-	#ifdef _ARK_ALLENCAHN_FLIP
-	// face.h.BhDt[k] = 0.5*(face.owner->h.BarP[k]+face.neigh->h.BarP[k]);
-	face.h.BhDt[k] = (ow->h.BarP[k] + (dxow*ow->h.BarP_x[k] + dyow*ow->h.BarP_y[k])
-	+ ne->h.BarP[k] + (dxne*ne->h.BarP_x[k] + dyne*ne->h.BarP_y[k]))/2;
-	#endif
-	//!momentum
-	#ifdef _ARK_MOMENTUM_FLIP			  
-	face.f.BhDt[k] = (ow->f.BarP[k] + (dxow*ow->f.BarP_x[k] + dyow*ow->f.BarP_y[k])
-	+ ne->f.BarP[k] + (dxne*ne->f.BarP_x[k] + dyne*ne->f.BarP_y[k]))/2;
-	// face.f.BhDt[k] = 0.5*(face.owner->f.BarP[k]+face.neigh->f.BarP[k]);
-	#endif
-	//isothermal flip
-	#ifdef _ARK_THERMAL_FLIP
-	face.g.BhDt[k] = 0.5*(face.owner->g.BarP[k] + face.neigh->g.BarP[k]);
-	#endif
-}
-void CD_Interior_DVDF_Bh(Face_2D &face,int const k)
-{
-	#ifdef _ARK_ALLENCAHN_FLIP
-	double _hBP_xF = 1000,_hBP_yF = 1000;
-	#endif
-	//!momentum
-	#ifdef _ARK_MOMENTUM_FLIP
-	double _fBP_xF = 1000,_fBP_yF = 1000;
-	#endif
-	//!isothermal
-	#ifdef _ARK_THERMAL_FLIP
-	double _gBP_xF = 1000,_gBP_yF = 1000;
-	#endif
-	//!central difference
-	if(0.0 == face.Vx)
-	{
-		#ifdef _ARK_ALLENCAHN_FLIP
-		//_hBP_xF = 0.5*(face.owner->h.BarP_x[k] + face.neigh->h.BarP_x[k]);
-		_hBP_xF = (0.5*(face.faceCells[3]->h.BarP[k] - face.faceCells[1]->h.BarP[k])
-				+ 0.5*(face.faceCells[2]->h.BarP[k] - face.faceCells[0]->h.BarP[k]))
-				/face._dx;
-		_hBP_yF = (face.owner->h.BarP[k] - face.neigh->h.BarP[k])/face._dy;
-		#endif
-		//
-		//!momentum
-		#ifdef _ARK_MOMENTUM_FLIP
-		_fBP_xF = (0.5*(face.faceCells[3]->f.BarP[k] - face.faceCells[1]->f.BarP[k])
-				+ 0.5*(face.faceCells[2]->f.BarP[k] - face.faceCells[0]->f.BarP[k]))
-				/face._dx;
-		_fBP_yF = (face.owner->f.BarP[k] - face.neigh->f.BarP[k])/face._dy;
-		#endif
-		//!isothemal
-		#ifdef _ARK_THERMAL_FLIP
-		//_gBP_xF =  0.5*(face.owner->g.BarP_x[k] + face.neigh->g.BarP_x[k]);
-		_gBP_xF = (0.5*(face.faceCells[3]->g.BarP[k] - face.faceCells[1]->g.BarP[k])
-				+ 0.5*(face.faceCells[2]->g.BarP[k] - face.faceCells[0]->g.BarP[k]))
-				/face._dx;
-		_gBP_yF = (face.owner->g.BarP[k] - face.neigh->g.BarP[k])/face._dy;
-		#endif
-	}
-	else if(0.0 == face.Vy)
-	{
-		#ifdef _ARK_ALLENCAHN_FLIP
-		//_hBP_yF = 0.5*(face.owner->h.BarP_y[k] + face.neigh->h.BarP_y[k]);
-		_hBP_yF = (0.5*(face.faceCells[3]->h.BarP[k] - face.faceCells[1]->h.BarP[k])
-				+ 0.5*(face.faceCells[2]->h.BarP[k] - face.faceCells[0]->h.BarP[k]))
-				/face._dy;
-		_hBP_xF = (face.owner->h.BarP[k] - face.neigh->h.BarP[k])/face._dx;
-		#endif
-		//
-		//!momentum
-		#ifdef _ARK_MOMENTUM_FLIP
-		_fBP_yF = (0.5*(face.faceCells[3]->f.BarP[k] - face.faceCells[1]->f.BarP[k])
-				+ 0.5*(face.faceCells[2]->f.BarP[k] - face.faceCells[0]->f.BarP[k]))
-				/face._dy;
-		_fBP_xF = (face.owner->f.BarP[k] - face.neigh->f.BarP[k])/face._dx;
-		#endif
-		//
-		#ifdef _ARK_THERMAL_FLIP
-		_gBP_yF = (0.5*(face.faceCells[3]->g.BarP[k] - face.faceCells[1]->g.BarP[k])
-				+ 0.5*(face.faceCells[2]->g.BarP[k] - face.faceCells[0]->g.BarP[k]))
-				/face._dy;
-		_gBP_xF = (face.owner->g.BarP[k] - face.neigh->g.BarP[k])/face._dx;
-		#endif
-	}
-	else
-	{
-		cout <<"wrong interface"<<endl;
-		getchar();
-	}
-	#ifdef _ARK_ALLENCAHN_FLIP
-	face.h.BhDt[k] = 0.5*(face.owner->h.BarP[k] + face.neigh->h.BarP[k])
-			- hDt*(_hBP_xF*xi_u[k] + _hBP_yF*xi_v[k]);
-	#endif
-	//!momentum
-	#ifdef _ARK_MOMENTUM_FLIP
-	face.f.BhDt[k] = 0.5*(face.owner->f.BarP[k] + face.neigh->f.BarP[k])
-			- hDt*(_fBP_xF*xi_u[k] + _fBP_yF*xi_v[k]);
-	#endif
-	//!isothemal
-	#ifdef _ARK_THERMAL_FLIP
-	face.g.BhDt[k] = 0.5*(face.owner->g.BarP[k] + face.neigh->g.BarP[k])
-			- hDt*(_gBP_xF*xi_u[k] + _gBP_yF*xi_v[k]);
-	#endif	
-}
 void Update_DVDF_Bh(Face_2D &face)
 {
 	LoopVS(Q)
 	{
-		#if defined _FLUX_SCHEME_CD_ARK
-			CD_Interior_DVDF_Bh(face,k);
-		#elif defined _FLUX_SCHEME_UW_ARK
+	#if defined _FLUX_SCHEME_CD_ARK
+
+		CD_Interior_DVDF_Bh(face,k);
+
+	#elif defined _FLUX_SCHEME_UW_ARK
+
 		if(face.xi_n_dS[k] > 0)
 			UW_Interior_DVDF_Bh(face,face.owner,k);
 		else if(face.xi_n_dS[k] < 0)
 			UW_Interior_DVDF_Bh(face,face.neigh,k);
 		else
 			UW_Interior_DVDF_Bh(face,k);
-		#else 
-			exit(-1);
-		#endif
+
+	#elif defined _FLUX_SCHEME_RBF_ARK
+
+		if(face.xi_n_dS[k] >= 0)
+			RBF_Interior_DVDF_Bh(face,face.owner,k);
+		else if(face.xi_n_dS[k] < 0)
+			RBF_Interior_DVDF_Bh(face,face.neigh,k);
+		else
+			RBF_Interior_DVDF_Bh(face,k);
+
+	#else 
+		exit(-1);
+	#endif
 	}
 }
 void Update_DVDF_Bh_Limiter(Face_2D &face)
 {
 	LoopVS(Q)
 	{
-		#if defined _FLUX_SCHEME_CD_ARK
-			CD_Interior_DVDF_Bh(face,k);
-		#elif defined _FLUX_SCHEME_UW_ARK	
+	#if defined _FLUX_SCHEME_CD_ARK
+
+		CD_Interior_DVDF_Bh(face,k);
+
+	#elif defined _FLUX_SCHEME_UW_ARK
+
 		if(face.xi_n_dS[k] >= 0)
 			UW_Interior_DVDF_Bh_Limiter(face,face.owner,k);
 		else
 			UW_Interior_DVDF_Bh_Limiter(face,face.neigh,k);
-		#else 
-			exit(-1);
-		#endif
+
+	#elif defined _FLUX_SCHEME_RBF_ARK
+
+		if(face.xi_n_dS[k] >= 0)
+			UW_Interior_DVDF_Bh_Limiter(face,face.owner,k);
+		else
+			UW_Interior_DVDF_Bh_Limiter(face,face.neigh,k);
+
+	#else 
+
+		exit(-1);
+	#endif
 	}
 }
 void Flux_2D_Limiter(Face_2D &face)
@@ -850,7 +593,7 @@ void Update_SumRho(int step)
 	::SumT = 0.0;
 	LoopPS(Cells)
 	{
-		::SumRho += CellArray[n].MsQ().Phi;
+		::SumRho += CellArray[n].MsQ().Rho;
 		#ifdef _ARK_THERMAL_FLIP 
 		::SumT += CellArray[n].MsQ().T;
 		#endif

@@ -18,7 +18,9 @@ SRC = $(foreach dir,$(DIR_SRC),$(wildcard $(dir)/*.cpp))
 
 DIR_OBJ = ./Obj
 
-DIR_OUT = ../FlowField/global ../FlowField/Convergence
+DIR_OUT = ../FlowField
+
+#../FlowField/global ../FlowField/Convergence
 
 subObjs = $(patsubst %.cpp,${DIR_OBJ}/%.o,$(notdir ${SRC}))
 
@@ -43,8 +45,10 @@ ${DIR_OBJ}/${QModel}.o:./Lib/${QModel}.cpp
 .PHONY:clean
 clean:
 	find -name "${Target}" -exec mv {} ~/.trash/ \;
-	find ${DIR_OBJ} -name "*.o" -exec mv {} ~/.trash/ \;
-	find ${DIR_OUT} -name "*.dat" -exec mv {} ~/.trash/ \; 
+	find ${DIR_OBJ} -name "*.o" -type f -exec mv {} ~/.trash/ \;
+	find ${DIR_OUT} -name "*.dat" -type f -exec mv {} ~/.trash/ \; 
+	find ${DIR_OUT} -name "*.ark" -type f -exec mv {} ~/.trash/ \;
+	find ${DIR_OUT} -name "tecplot-derived" -type d -exec mv -f {} ~/.trash/ \; 
 
 # headers = ZeroDeclaration.h Mesh_2D.h ZeroConstant.h $(QModel).h ZeroReference.h ZeroFlip.h
 

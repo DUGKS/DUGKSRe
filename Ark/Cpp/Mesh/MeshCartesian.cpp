@@ -265,7 +265,7 @@ int locateFaceIndex(Face_2D const *const faceptr)
 	}
 	return -1;
 }
-Cell_2D const* targetCell(Cell_2D const *const cellptr)
+Cell_2D* targetCell(Cell_2D* cellptr)
 {
 	if(nullptr == cellptr->ShadowC)
 		return cellptr;

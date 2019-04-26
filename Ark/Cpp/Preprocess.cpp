@@ -13,7 +13,7 @@ string caseName;
 //------------------------------------------Initialization------------------------------
 void UniformFlow()
 {
-		caseName = "UniformFlow";
+		caseName = __func__;
 		MacroQuantity Initial(Rho0,U0,V0,p0,T0,Lambda0,Mu0);
 		LoopPS(Cells)
 		{
@@ -94,7 +94,7 @@ void UniformFlow()
 }
 void ShockStructure()
 {
-	caseName = "ShockStructure";
+	caseName = __func__;
 	double Mu_R = Mu0*pow(T_R/T0,Omega0),Tau_R = Mu_R/p_R;
 //
 	MacroQuantity left(Rho0,U0,V0,p0,T0,Lambda0,Mu0);
@@ -326,7 +326,7 @@ void SCMP_FlatInterface()
 }
 void SCMP_Drop()
 {
-	caseName = "ShockStructure";
+	caseName = __func__;
 	using namespace PseudoPotentialSC;
 	MacroQuantity Initial(Rho0,U0,V0,p0,T0,Lambda0,Mu0);
 	LoopPS(Cells)
@@ -1359,7 +1359,15 @@ void SelfCheck()
 	#endif
 //
 	#if defined _FLUX_SCHEME_CD_ARK && defined _FLUX_SCHEME_UW_ARK
-	#error "Fatal Error : Flux Scheme collision"
+	#error "Fatal Error : Flux Scheme CD-UW collision"
+	#endif
+
+	#if defined _FLUX_SCHEME_CD_ARK && defined _FLUX_SCHEME_RBF_ARK
+	#error "Fatal Error : Flux Scheme CD-RBF collision"
+	#endif
+
+	#if defined _FLUX_SCHEME_UW_ARK && defined _FLUX_SCHEME_RBF_ARK
+	#error "Fatal Error : Flux Scheme UW-RBF collision"
 	#endif
 
 	#if defined _GRAD_SCHEME_9Points && defined _GRAD_SCHEME_5Points
@@ -1401,6 +1409,14 @@ void SelfCheck()
 			cout <<"\"UW\" != _FLUX_SCHEME_ARK"<<endl;
 			getchar();
 		}
+	#elif defined _FLUX_SCHEME_RBF_ARK
+	string flux_scheme = _FLUX_SCHEME_ARK;
+	if("RBF" != flux_scheme)
+	{
+		_PRINT_ERROR_MSG_FLIP
+		cout <<"\"RBF\" != _FLUX_SCHEME_ARK"<<endl;
+		getchar();
+	}
 	#endif
 	string meshType = _MESHTYPE_ARK;
 	if("Quad" == meshType || "Tri" == meshType)

@@ -18,8 +18,6 @@ namespace RBF{
 
 	inline double kernel(double const Euclid){return sqrt(Euclid/9.0 + RBF::c);}
 
-	int const DIM = 9;
-
 	const double 
 	//if dx == 3 dy == 4
 	A = kernel(::dx*::dx), //3
@@ -67,29 +65,35 @@ void RBF::setInverseM()
 	}
 }
 //x := deltax, y := deltay
-double valueRBF(Cell_2D const *cellptr,double const x,double const y)
+
+extern Cell_2D* targetCell(Cell_2D* cellptr);
+
+double valueRBF(double const *wRBF, Cell_2D* cellptr,double const x,double const y)
 {
 	using RBF::kernel;
 
+	cellptr = targetCell(cellptr);
 	double 
-	tmp = cellptr->wRBF[0]*kernel(x*x + y*y)
-	    + cellptr->wRBF[1]*kernel((::dx-x)*(::dx-x) + y*y)
-	    + cellptr->wRBF[2]*kernel(x*x + (::dy-y)*(::dy-y))
-	    + cellptr->wRBF[3]*kernel((::dx+x)*(::dx+x) + y*y)
-	    + cellptr->wRBF[4]*kernel(x*x + (::dy+y)*(::dy+y))
-	    + cellptr->wRBF[5]*kernel((::dx-x)*(::dx-x) + (::dy-y)*(::dy-y))
-	    + cellptr->wRBF[6]*kernel((::dx+x)*(::dx+x) + (::dy-y)*(::dy-y))
-	    + cellptr->wRBF[7]*kernel((::dx+x)*(::dx+x) + (::dy+y)*(::dy+y))
-	    + cellptr->wRBF[8]*kernel((::dx-x)*(::dx-x) + (::dy+y)*(::dy+y));
+	tmp = wRBF[0]*kernel(x*x + y*y)
+	    + wRBF[1]*kernel((::dx-x)*(::dx-x) + y*y)
+	    + wRBF[2]*kernel(x*x + (::dy-y)*(::dy-y))
+	    + wRBF[3]*kernel((::dx+x)*(::dx+x) + y*y)
+	    + wRBF[4]*kernel(x*x + (::dy+y)*(::dy+y))
+	    + wRBF[5]*kernel((::dx-x)*(::dx-x) + (::dy-y)*(::dy-y))
+	    + wRBF[6]*kernel((::dx+x)*(::dx+x) + (::dy-y)*(::dy-y))
+	    + wRBF[7]*kernel((::dx+x)*(::dx+x) + (::dy+y)*(::dy+y))
+	    + wRBF[8]*kernel((::dx-x)*(::dx-x) + (::dy+y)*(::dy+y));
 	return tmp;
 }
-void SetwRBF(Cell_2D *cellptr,Cell_2D::DVDF Cell_2D::*dvdf,int k)
+
+void SetwRBF(double *wRBF,Cell_2D *cellptr,Cell_2D::DVDF Cell_2D::*dvdf,int const k)
 {
 	using RBF::InverseM;
 
+	cellptr = targetCell(cellptr);
 	for(int m = 0;m < RBF::DIM;++m)
 	{
-		cellptr->wRBF[m] = 
+		wRBF[m] = 
 			InverseM[m][0]*(cellptr->*dvdf).BarP[k]
 
 		+	InverseM[m][1]*(cellptr->Cell_C[0]->*dvdf).BarP[k]
@@ -103,13 +107,14 @@ void SetwRBF(Cell_2D *cellptr,Cell_2D::DVDF Cell_2D::*dvdf,int k)
 		+	InverseM[m][8]*(cellptr->Cell_Diag[3]->*dvdf).BarP[k];
 	}
 }
-void SetwRBF(Cell_2D *cellptr,double MacroQuantity::*var)
+void SetwRBF(double *wRBF, Cell_2D *cellptr,double MacroQuantity::*var)
 {
 	using RBF::InverseM;
 
+	cellptr = targetCell(cellptr);
 	for(int m = 0;m < RBF::DIM;++m)
 	{
-		cellptr->wRBF[m] = 
+		wRBF[m] = 
 			InverseM[m][0]*(cellptr->MsQ()).*var
 
 		+	InverseM[m][1]*(cellptr->Cell_C[0]->MsQ()).*var
@@ -124,60 +129,59 @@ void SetwRBF(Cell_2D *cellptr,double MacroQuantity::*var)
 	}
 }
 extern double RBFTestAnalytic(double const x,double const y);
-extern Cell_2D const* targetCell(Cell_2D const *const cellptr);
+
 void RBFPrecisionTest()
 {
-// 	LoopPS(Cells)
-// 	{
-// 		Cell_2D &cell = CellArray[n];
-// 		SetwRBF(&cell,&Cell_2D::h,5);
-// 	}
-// 	LoopPS(Faces)
-// 	{
-// 		Face_2D &face = FaceArray[n];
-// 		double 
-// 		dxOwner = face.xf - face.owner->xc,
-// 		dyOwner = face.yf - face.owner->yc,
-// 		dxNeigh = face.xf - face.neigh->xc,
-// 		dyNeigh = face.yf - face.neigh->yc;
+	// LoopPS(Cells)
+	// {
+	// 	Cell_2D &cell = CellArray[n];
+	// 	SetwRBF(&cell,&Cell_2D::h,5);
+	// }
+	// LoopPS(Faces)
+	// {
+	// 	Face_2D &face = FaceArray[n];
+	// 	double 
+	// 	dxOwner = face.xf - face.owner->xc,
+	// 	dyOwner = face.yf - face.owner->yc,
+	// 	dxNeigh = face.xf - face.neigh->xc,
+	// 	dyNeigh = face.yf - face.neigh->yc;
 
-// 		Cell_2D const *neigh = targetCell(face.neigh);
-// 		face.h.hDt[5] = 0.0;
+	// 	face.h.hDt[5] = 0.0;
 
-// 		face.h.hDt[5] += valueRBF(face.owner,dxOwner,dyOwner);
-// 		face.h.hDt[5] += valueRBF(neigh,dxNeigh,dyNeigh);
-// 		face.h.hDt[5] /= 2;
-// 	}
-// 	// LoopPS(Faces)
-// 	// {
-// 	// 	Face_2D &face = FaceArray[n];
-// 	// 	Info << (RBFTestAnalytic(face.xf,face.yf))<<fs;
-// 	// 	cout << (face.h.hDt[5])<<fs;
-// 	// 	cout << face.xf << fs << face.yf<<endl;
-// 	// }
-// 	// LoopPS(Cells)
-// 	// {
-// 	// 	Cell_2D &cell = CellArray[n];
-// 	// 	double tmpAN = cell.Cell_C[3]->MsQ().Rho - valueRBF(&cell,0,-::dy);
-// 	// 	if(fabs(tmpAN) > ::infinitesimal)
-// 	// 	Info << tmpAN<<endl;
-// 	// }
-// 	double ErrorLmax = 0.0,Errortmp = 0.0;
-// 	double ErrorL2 = 0.0, dVar = 0.0,sumVar = 0.0,sumdVar = 0.0;
-// 	LoopPS(Faces)
-// 	{
-// 		Face_2D &face = FaceArray[n];
+	// 	face.h.hDt[5] += valueRBF(face.owner,dxOwner,dyOwner);
+	// 	face.h.hDt[5] += valueRBF(face.neigh,dxNeigh,dyNeigh);
+	// 	face.h.hDt[5] /= 2;
+	// }
+	// LoopPS(Faces)
+	// {
+	// 	Face_2D &face = FaceArray[n];
+	// 	Info << (RBFTestAnalytic(face.xf,face.yf))<<fs;
+	// 	cout << (face.h.hDt[5])<<fs;
+	// 	cout << face.xf << fs << face.yf<<endl;
+	// }
+	// LoopPS(Cells)
+	// {
+	// 	Cell_2D &cell = CellArray[n];
+	// 	double tmpAN = cell.Cell_C[3]->MsQ().Rho - valueRBF(&cell,0,-::dy);
+	// 	if(fabs(tmpAN) > ::infinitesimal)
+	// 	Info << tmpAN<<endl;
+	// }
+	// double ErrorLmax = 0.0,Errortmp = 0.0;
+	// double ErrorL2 = 0.0, dVar = 0.0,sumVar = 0.0,sumdVar = 0.0;
+	// LoopPS(Faces)
+	// {
+	// 	Face_2D &face = FaceArray[n];
 
-// 		Errortmp = fabs(face.h.hDt[5] - RBFTestAnalytic(face.xf,face.yf));
-// 		if(Errortmp > ErrorLmax)
-// 			ErrorLmax = Errortmp;
+	// 	Errortmp = fabs(face.h.hDt[5] - RBFTestAnalytic(face.xf,face.yf));
+	// 	if(Errortmp > ErrorLmax)
+	// 		ErrorLmax = Errortmp;
 
-// 		dVar = fabs(face.h.hDt[5] - RBFTestAnalytic(face.xf,face.yf));
-// 		sumdVar += dVar*dVar;
-// 		sumVar += RBFTestAnalytic(face.xf,face.yf)*RBFTestAnalytic(face.xf,face.yf);
-// 	}
-// 	ErrorL2 = sqrt(sumdVar/(sumVar+1e-30));
-// 	Info << "ErrorL2 : "<<ErrorL2 << endl;
-// 	Info << "ErrorLmax : "<<ErrorLmax << endl;
-// 	Output_Flowfield((step)*::dt,step);
+	// 	dVar = fabs(face.h.hDt[5] - RBFTestAnalytic(face.xf,face.yf));
+	// 	sumdVar += dVar*dVar;
+	// 	sumVar += RBFTestAnalytic(face.xf,face.yf)*RBFTestAnalytic(face.xf,face.yf);
+	// }
+	// ErrorL2 = sqrt(sumdVar/(sumVar+1e-30));
+	// Info << "ErrorL2 : "<<ErrorL2 << endl;
+	// Info << "ErrorLmax : "<<ErrorLmax << endl;
+	// Output_Flowfield((step)*::dt,step);
 }

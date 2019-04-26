@@ -59,6 +59,8 @@ namespace RBF
 {
 	const double c = 35;
 
+	int const DIM = 9;
+
 	void setInverseM();
 }
 
@@ -179,7 +181,7 @@ End_Step = 100000,//log(2.0)/(8.0*PI*PI*Nu0*dt),
 
 ZeroDebugControl = 100, //
 
-ConvergenceControl = 1000, //SumRho,SumT,independent
+ConvergenceControl = 100, //SumRho,SumT,independent
 
 ResidualControl = 1000, //print to screen
 

@@ -24,10 +24,16 @@
 #define _MESHTYPE_ARK "Car"
 #endif
 
-#ifndef _FLUX_SCHEME_UW_ARK
-#define _FLUX_SCHEME_UW_ARK "UW"	
-#define _FLUX_SCHEME_ARK _FLUX_SCHEME_UW_ARK
+// #ifndef _FLUX_SCHEME_UW_ARK
+// #define _FLUX_SCHEME_UW_ARK "UW"	
+// #define _FLUX_SCHEME_ARK _FLUX_SCHEME_UW_ARK
+// #endif
+
+#ifndef _FLUX_SCHEME_RBF_ARK
+#define _FLUX_SCHEME_RBF_ARK "RBF"	
+#define _FLUX_SCHEME_ARK _FLUX_SCHEME_RBF_ARK
 #endif
+
 
 // #ifndef _FLUX_SCHEME_CD_ARK
 // #define _FLUX_SCHEME_CD_ARK "CD"
