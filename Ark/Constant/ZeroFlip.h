@@ -29,10 +29,15 @@
 // #define _FLUX_SCHEME_ARK _FLUX_SCHEME_UW_ARK
 // #endif
 
-#ifndef _FLUX_SCHEME_RBF_ARK
-#define _FLUX_SCHEME_RBF_ARK "RBF"	
-#define _FLUX_SCHEME_ARK _FLUX_SCHEME_RBF_ARK
+#ifndef _FLUX_SCHEME_UW3RD_ARK
+#define _FLUX_SCHEME_UW3RD_ARK "UW3rd"	
+#define _FLUX_SCHEME_ARK _FLUX_SCHEME_UW3RD_ARK
 #endif
+
+// #ifndef _FLUX_SCHEME_RBF_ARK
+// #define _FLUX_SCHEME_RBF_ARK "RBF"	
+// #define _FLUX_SCHEME_ARK _FLUX_SCHEME_RBF_ARK
+// #endif
 
 
 // #ifndef _FLUX_SCHEME_CD_ARK

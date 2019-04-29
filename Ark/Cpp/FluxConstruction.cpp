@@ -14,6 +14,8 @@ extern void SetwRBF(double *wRBF,Cell_2D *cellptr,double MacroQuantity::*var);
 
 extern double valueRBF(double const *wRBF,Cell_2D* cellptr,double const x,double const y);
 
+extern Cell_2D* targetCell(Cell_2D* cellptr);
+
 inline
 double VenkatakrishnanExpression(double a,double b)
 {
@@ -174,6 +176,100 @@ void UW_Interior_DVDF_Bh(Face_2D& face,int const k)
 	//isothermal flip
 	#ifdef _ARK_THERMAL_FLIP
 	face.g.BhDt[k] = 0.5*(face.owner->g.BarP[k] + face.neigh->g.BarP[k]);
+	#endif
+}
+
+extern double update_DVDF_x(Cell_2D const *cellptr,Cell_2D::DVDF Cell_2D::*dvdf, int const k);
+extern double update_DVDF_y(Cell_2D const *cellptr,Cell_2D::DVDF Cell_2D::*dvdf, int const k);
+extern double update_DVDF_xx(Cell_2D const *cellptr,Cell_2D::DVDF Cell_2D::*dvdf, int const k);
+extern double update_DVDF_yy(Cell_2D const *cellptr,Cell_2D::DVDF Cell_2D::*dvdf, int const k);
+extern double update_DVDF_xy(Cell_2D const *cellptr,Cell_2D::DVDF Cell_2D::*dvdf, int const k);
+
+void UW3rd_Interior_DVDF_Bh(Face_2D &face, Cell_2D* cellptr, int const k)
+{
+	double dx = face.xf - hDt*xi_u[k] - cellptr->xc;
+	double dy = face.yf - hDt*xi_v[k] - cellptr->yc;
+	Cell_2D const *cellPointer = targetCell(cellptr);
+
+	#ifdef _ARK_ALLENCAHN_FLIP
+	double hBP_x = 0.0, hBP_y = 0.0, hBP_xx = 0.0, hBP_yy = 0.0, hBP_xy = 0.0;
+	#endif
+
+	//!momentum
+	#ifdef _ARK_MOMENTUM_FLIP
+	double fBP_x = 0.0, fBP_y = 0.0, fBP_xx = 0.0, fBP_yy = 0.0, fBP_xy = 0.0;
+
+	fBP_x  = update_DVDF_x(cellPointer, &Cell_2D::f, k);
+	fBP_y  = update_DVDF_y(cellPointer, &Cell_2D::f, k);
+	fBP_xx = update_DVDF_xx(cellPointer, &Cell_2D::f, k);
+	fBP_yy = update_DVDF_yy(cellPointer, &Cell_2D::f, k);
+	fBP_xy = update_DVDF_xy(cellPointer, &Cell_2D::f, k);
+
+	face.f.BhDt[k] = cellPointer->f.BarP[k] + dx*fBP_x + dy*fBP_y
+				   + dx*dx*fBP_xx/2 + dy*dy*fBP_yy/2 + dx*dy*fBP_xy;
+	#endif
+	//!thermal
+	#ifdef _ARK_THERMAL_FLIP
+	double gBP_x = 0.0, gBP_y = 0.0, gBP_xx = 0.0, gBP_yy = 0.0, gBP_xy = 0.0;
+	#endif
+
+
+}
+void UW3rd_Interior_DVDF_Bh(Face_2D &face, int const k)
+{
+	double dxOwner = face.xf - hDt*xi_u[k] - face.owner->xc;
+	double dyOwner = face.yf - hDt*xi_v[k] - face.owner->yc;
+
+	double dxNeigh = face.xf - hDt*xi_u[k] - face.neigh->xc;
+	double dyNeigh = face.yf - hDt*xi_v[k] - face.neigh->yc;
+
+	Cell_2D const *cellptrOwner = face.owner;
+	Cell_2D const *cellptrNeigh = targetCell(face.neigh);
+
+	#ifdef _ARK_ALLENCAHN_FLIP
+	double hBP_x = 0.0, hBP_y = 0.0, hBP_xx = 0.0, hBP_yy = 0.0, hBP_xy = 0.0;
+	#endif
+
+	//!momentum
+	#ifdef _ARK_MOMENTUM_FLIP
+
+	double 
+	fBP_xOwner = 0.0, fBP_yOwner = 0.0, 
+	fBP_xxOwner = 0.0, fBP_yyOwner = 0.0, 
+	fBP_xyOwner = 0.0;
+
+	double 
+	fBP_xNeigh = 0.0, fBP_yNeigh = 0.0, 
+	fBP_xxNeigh = 0.0, fBP_yyNeigh = 0.0, 
+	fBP_xyNeigh = 0.0;
+
+	fBP_xOwner  = update_DVDF_x(cellptrOwner, &Cell_2D::f, k);
+	fBP_yOwner  = update_DVDF_y(cellptrOwner, &Cell_2D::f, k);
+	fBP_xxOwner = update_DVDF_xx(cellptrOwner, &Cell_2D::f, k);
+	fBP_yyOwner = update_DVDF_yy(cellptrOwner, &Cell_2D::f, k);
+	fBP_xyOwner = update_DVDF_xy(cellptrOwner, &Cell_2D::f, k);
+
+	fBP_xNeigh  = update_DVDF_x(cellptrNeigh, &Cell_2D::f, k);
+	fBP_yNeigh  = update_DVDF_y(cellptrNeigh, &Cell_2D::f, k);
+	fBP_xxNeigh = update_DVDF_xx(cellptrNeigh, &Cell_2D::f, k);
+	fBP_yyNeigh = update_DVDF_yy(cellptrNeigh, &Cell_2D::f, k);
+	fBP_xyNeigh = update_DVDF_xy(cellptrNeigh, &Cell_2D::f, k);
+
+	face.f.BhDt[k] = cellptrOwner->f.BarP[k]
+				   + dxOwner*fBP_xOwner + dyOwner*fBP_yOwner
+				   + dxOwner*dxOwner*fBP_xxOwner/2 + dyOwner*dyOwner*fBP_yyOwner/2
+				   + dxOwner*dyOwner*fBP_xyOwner;
+
+	face.f.BhDt[k] += cellptrNeigh->f.BarP[k]
+				   + dxNeigh*fBP_xNeigh + dyNeigh*fBP_yNeigh
+				   + dxNeigh*dxNeigh*fBP_xxNeigh/2 + dyNeigh*dyNeigh*fBP_yyNeigh/2
+				   + dxNeigh*dyNeigh*fBP_xyNeigh;
+
+	face.f.BhDt[k] /= 2;
+	#endif
+	//!thermal
+	#ifdef _ARK_THERMAL_FLIP
+	double gBP_x = 0.0, gBP_y = 0.0, gBP_xx = 0.0, gBP_yy = 0.0, gBP_xy = 0.0;
 	#endif
 }
 

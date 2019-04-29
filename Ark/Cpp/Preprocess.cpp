@@ -1417,6 +1417,14 @@ void SelfCheck()
 		cout <<"\"RBF\" != _FLUX_SCHEME_ARK"<<endl;
 		getchar();
 	}
+	#elif defined _FLUX_SCHEME_UW3RD_ARK
+	string flux_scheme = _FLUX_SCHEME_ARK;
+	if("UW3rd" != flux_scheme)
+	{
+		_PRINT_ERROR_MSG_FLIP
+		cout <<"\"RBF\" != _FLUX_SCHEME_ARK"<<endl;
+		getchar();
+	}
 	#endif
 	string meshType = _MESHTYPE_ARK;
 	if("Quad" == meshType || "Tri" == meshType)

@@ -111,6 +111,10 @@ extern void UW_Interior_DVDF_Bh(Face_2D& face,Cell_2D const* ptr_C,int const k);
 
 extern void UW_Interior_DVDF_Bh(Face_2D& face,int const k);
 
+extern void UW3rd_Interior_DVDF_Bh(Face_2D &face, Cell_2D* cellptr, int const k);
+
+extern void UW3rd_Interior_DVDF_Bh(Face_2D& face,int const k);
+
 extern void RBF_Interior_DVDF_Bh(Face_2D& face,Cell_2D* ptr_C,int const k);
 
 extern void RBF_Interior_DVDF_Bh(Face_2D& face,int const k);
@@ -486,12 +490,21 @@ void Update_DVDF_Bh(Face_2D &face)
 
 	#elif defined _FLUX_SCHEME_RBF_ARK
 
-		if(face.xi_n_dS[k] >= 0)
+		if(face.xi_n_dS[k] > 0)
 			RBF_Interior_DVDF_Bh(face,face.owner,k);
 		else if(face.xi_n_dS[k] < 0)
 			RBF_Interior_DVDF_Bh(face,face.neigh,k);
 		else
 			RBF_Interior_DVDF_Bh(face,k);
+
+	#elif defined _FLUX_SCHEME_UW3RD_ARK
+
+		if(face.xi_n_dS[k] > 0)
+			UW3rd_Interior_DVDF_Bh(face,face.owner,k);
+		else if(face.xi_n_dS[k] < 0)
+			UW3rd_Interior_DVDF_Bh(face,face.neigh,k);
+		else
+			UW3rd_Interior_DVDF_Bh(face,k);
 
 	#else 
 		exit(-1);

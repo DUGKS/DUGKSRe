@@ -10,13 +10,15 @@ using std::endl;
 
 double const
 
-DeltaX = dx,
+DeltaX = ::dx,
 
-DeltaY = dy,
+DeltaY = ::dy,
 
-dxSq = DeltaX*DeltaX,
+dxSq = ::dx*::dx,
 
-dySq = DeltaY*DeltaY;
+dySq = ::dy*::dy,
+
+dxdy = ::dx*::dy;
 
 #include "GradSchemeBasic.h"
 

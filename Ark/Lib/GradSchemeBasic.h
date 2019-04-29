@@ -2,7 +2,9 @@ int const
 
 apsi = 4, 
 
-bpsi = 1;
+bpsi = 1,
+
+cpsi = 10; //for isotropic second order derivative
 //
 double const 
 
@@ -73,6 +75,89 @@ void Grad_LSMatrix()
 	cout <<"LeastSquare Matrix Construction Done" << endl;
 	printSplitLine(nl);
 }
+double update_DVDF_x(Cell_2D const *cellptr,Cell_2D::DVDF Cell_2D::*dvdf, int const k)
+{
+	return 
+	(
+		apsi*
+	 	(
+	 		((cellptr->Cell_C[0]->*dvdf).BarP[k]) - ((cellptr->Cell_C[2]->*dvdf).BarP[k])
+	 	)
+	  + bpsi*
+	   	(
+	 		((cellptr->Cell_Diag[0]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[1]->*dvdf).BarP[k])
+	 	+   ((cellptr->Cell_Diag[3]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[2]->*dvdf).BarP[k])
+	   	)
+	)/(_2dx*6);
+}
+
+double update_DVDF_y(Cell_2D const *cellptr,Cell_2D::DVDF Cell_2D::*dvdf, int const k)
+{
+	return 
+	(
+		apsi*
+	    (
+	      ((cellptr->Cell_C[1]->*dvdf).BarP[k]) - ((cellptr->Cell_C[3]->*dvdf).BarP[k])
+	    )
+	  + bpsi*
+	    (
+	  		((cellptr->Cell_Diag[0]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[3]->*dvdf).BarP[k])
+	  	+   ((cellptr->Cell_Diag[1]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[2]->*dvdf).BarP[k])
+	  	)
+	)/(_2dy*6);
+}
+double update_DVDF_xx(Cell_2D const *cellptr,Cell_2D::DVDF Cell_2D::*dvdf, int const k)
+{
+	return 
+	(
+		cpsi*
+		(
+			(cellptr->Cell_C[0]->*dvdf).BarP[k]
+		  + (cellptr->Cell_C[2]->*dvdf).BarP[k]
+		  - 2*(cellptr->*dvdf).BarP[k]
+		)
+	  + bpsi*
+	  	(
+	  		(cellptr->Cell_Diag[0]->*dvdf).BarP[k]
+	  	  + (cellptr->Cell_Diag[1]->*dvdf).BarP[k]
+	  	  + (cellptr->Cell_Diag[2]->*dvdf).BarP[k]
+	  	  + (cellptr->Cell_Diag[3]->*dvdf).BarP[k]
+	  	  - 2*(cellptr->Cell_C[1]->*dvdf).BarP[k]
+	  	  - 2*(cellptr->Cell_C[3]->*dvdf).BarP[k]
+	  	)
+	)/(dxSq*12);
+}
+double update_DVDF_yy(Cell_2D const *cellptr,Cell_2D::DVDF Cell_2D::*dvdf, int const k)
+{
+	return 
+	(
+		cpsi*
+		(
+			(cellptr->Cell_C[1]->*dvdf).BarP[k]
+		  + (cellptr->Cell_C[3]->*dvdf).BarP[k]
+		  - 2*(cellptr->*dvdf).BarP[k]
+		)
+	  + bpsi*
+	  	(
+	  		(cellptr->Cell_Diag[0]->*dvdf).BarP[k]
+	  	  + (cellptr->Cell_Diag[1]->*dvdf).BarP[k]
+	  	  + (cellptr->Cell_Diag[2]->*dvdf).BarP[k]
+	  	  + (cellptr->Cell_Diag[3]->*dvdf).BarP[k]
+	  	  - 2*(cellptr->Cell_C[0]->*dvdf).BarP[k]
+	  	  - 2*(cellptr->Cell_C[2]->*dvdf).BarP[k]
+	  	)
+	)/(dySq*12);
+}
+double update_DVDF_xy(Cell_2D const *cellptr,Cell_2D::DVDF Cell_2D::*dvdf, int const k)
+{
+	return 
+	(
+		(cellptr->Cell_Diag[0]->*dvdf).BarP[k]
+	  - (cellptr->Cell_Diag[1]->*dvdf).BarP[k]
+	  + (cellptr->Cell_Diag[2]->*dvdf).BarP[k]
+	  - (cellptr->Cell_Diag[3]->*dvdf).BarP[k]	
+	)/(dxdy*4);
+}
 void update_DVDF_Grad4points(Cell_2D *cellptr,Cell_2D::DVDF Cell_2D::*dvdf)
 {
 	LoopVS(Q)
@@ -96,32 +181,34 @@ void update_DVDF_Grad6points(Cell_2D *cellptr,Cell_2D::DVDF Cell_2D::*dvdf)
 {
 	LoopVS(Q)
 	{
-		(cellptr->*dvdf).BarP_x[k]
-		=
-		(
-			apsi*
-	  	  	(
-	  	    ((cellptr->Cell_C[0]->*dvdf).BarP[k]) - ((cellptr->Cell_C[2]->*dvdf).BarP[k])
-	  	  	)
-	  	  + bpsi*
-	  	  	(
-	  			((cellptr->Cell_Diag[0]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[1]->*dvdf).BarP[k])
-	  		+   ((cellptr->Cell_Diag[3]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[2]->*dvdf).BarP[k])
-	  	  	)
-		)/(_2dx*6);
-	//
-		(cellptr->*dvdf).BarP_y[k] = 
-		(
-			apsi*
-		    (
-		      ((cellptr->Cell_C[1]->*dvdf).BarP[k]) - ((cellptr->Cell_C[3]->*dvdf).BarP[k])
-		    )
-		  + bpsi*
-		    (
-		  		((cellptr->Cell_Diag[0]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[3]->*dvdf).BarP[k])
-		  	+   ((cellptr->Cell_Diag[1]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[2]->*dvdf).BarP[k])
-		  	)
-		)/(_2dy*6);
+	// 	(cellptr->*dvdf).BarP_x[k]
+	// 	=
+	// 	(
+	// 		apsi*
+	//   	  	(
+	//   	    ((cellptr->Cell_C[0]->*dvdf).BarP[k]) - ((cellptr->Cell_C[2]->*dvdf).BarP[k])
+	//   	  	)
+	//   	  + bpsi*
+	//   	  	(
+	//   			((cellptr->Cell_Diag[0]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[1]->*dvdf).BarP[k])
+	//   		+   ((cellptr->Cell_Diag[3]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[2]->*dvdf).BarP[k])
+	//   	  	)
+	// 	)/(_2dx*6);
+	// //
+	// 	(cellptr->*dvdf).BarP_y[k] = 
+	// 	(
+	// 		apsi*
+	// 	    (
+	// 	      ((cellptr->Cell_C[1]->*dvdf).BarP[k]) - ((cellptr->Cell_C[3]->*dvdf).BarP[k])
+	// 	    )
+	// 	  + bpsi*
+	// 	    (
+	// 	  		((cellptr->Cell_Diag[0]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[3]->*dvdf).BarP[k])
+	// 	  	+   ((cellptr->Cell_Diag[1]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[2]->*dvdf).BarP[k])
+	// 	  	)
+	// 	)/(_2dy*6);
+		(cellptr->*dvdf).BarP_x[k] = update_DVDF_x(cellptr,dvdf,k);
+		(cellptr->*dvdf).BarP_y[k] = update_DVDF_y(cellptr,dvdf,k);
 	}
 }
 void update_DVDF_Grad_LS(Cell_2D *center,Cell_2D::DVDF Cell_2D::*dvdf)
