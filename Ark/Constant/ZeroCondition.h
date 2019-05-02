@@ -12,9 +12,9 @@
 //unsteadyTaylorGreen();
 //TaylorCouetteInitialization();
 //ForceDrivenTG();
-SCMP_Drop();
+// SCMP_Drop();
 //SCMP_FlatInterface();
-//AC_Drop();
+AC_Drop();
 // AC_SpinodalDecomposition();
 // AC_Smoothed();
 // AC_ZalesakDisk();

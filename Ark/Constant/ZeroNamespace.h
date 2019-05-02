@@ -185,7 +185,7 @@ ConvergenceControl = 100, //SumRho,SumT,independent
 
 ResidualControl = 1000, //print to screen
 
-writeFileControl = 1000; //always >= ResidualControl
+writeFileControl = 10000; //always >= ResidualControl
 
 double const
 

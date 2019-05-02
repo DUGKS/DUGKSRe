@@ -279,6 +279,11 @@ void RBF_Interior_DVDF_Bh(Face_2D& face,Cell_2D* cellptr,int const k)
 	double dy = face.yf - hDt*xi_v[k] - cellptr->yc;
 	double wRBF[RBF::DIM] = {0.0};
 
+	#ifdef _ARK_ALLENCAHN_FLIP
+	SetwRBF(wRBF,cellptr,&Cell_2D::h,k);
+	face.h.BhDt[k] = valueRBF(wRBF,cellptr,dx,dy);
+	#endif
+
 	#ifdef _ARK_MOMENTUM_FLIP
 	SetwRBF(wRBF,cellptr,&Cell_2D::f,k);
 	face.f.BhDt[k] = valueRBF(wRBF,cellptr,dx,dy);
@@ -294,6 +299,13 @@ void RBF_Interior_DVDF_Bh(Face_2D& face,int const k)
 
 	double wRBFOwner[RBF::DIM] = {0.0};
 	double wRBFNeigh[RBF::DIM] = {0.0};
+
+	#ifdef _ARK_ALLENCAHN_FLIP
+	SetwRBF(wRBFOwner,face.owner,&Cell_2D::h,k);
+	SetwRBF(wRBFNeigh,face.neigh,&Cell_2D::h,k);
+	face.h.BhDt[k] = (valueRBF(wRBFOwner,face.owner,dxOwner,dyOwner)
+				   + valueRBF(wRBFNeigh,face.neigh,dxNeigh,dyNeigh))/2.0;
+	#endif
 
 	#ifdef _ARK_MOMENTUM_FLIP
 	SetwRBF(wRBFOwner,face.owner,&Cell_2D::f,k);

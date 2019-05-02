@@ -29,15 +29,15 @@
 // #define _FLUX_SCHEME_ARK _FLUX_SCHEME_UW_ARK
 // #endif
 
-#ifndef _FLUX_SCHEME_UW3RD_ARK
-#define _FLUX_SCHEME_UW3RD_ARK "UW3rd"	
-#define _FLUX_SCHEME_ARK _FLUX_SCHEME_UW3RD_ARK
-#endif
-
-// #ifndef _FLUX_SCHEME_RBF_ARK
-// #define _FLUX_SCHEME_RBF_ARK "RBF"	
-// #define _FLUX_SCHEME_ARK _FLUX_SCHEME_RBF_ARK
+// #ifndef _FLUX_SCHEME_UW3RD_ARK
+// #define _FLUX_SCHEME_UW3RD_ARK "UW3rd"	
+// #define _FLUX_SCHEME_ARK _FLUX_SCHEME_UW3RD_ARK
 // #endif
+
+#ifndef _FLUX_SCHEME_RBF_ARK
+#define _FLUX_SCHEME_RBF_ARK "RBF"	
+#define _FLUX_SCHEME_ARK _FLUX_SCHEME_RBF_ARK
+#endif
 
 
 // #ifndef _FLUX_SCHEME_CD_ARK
@@ -52,7 +52,7 @@
 #endif
 
 #ifndef _EOS_MODEL_ARK
-#define _EOS_MODEL_ARK "C-S"
+#define _EOS_MODEL_ARK "null"
 #endif
 
 #ifndef _MESHFILE_NAME_ARK
@@ -91,18 +91,18 @@
 // #endif
 //--------------------------------------multiphase model-------------------
 
-#ifndef _ARK_PSEUDOPSI_FLIP
-#define _ARK_PSEUDOPSI_FLIP
+// #ifndef _ARK_PSEUDOPSI_FLIP
+// #define _ARK_PSEUDOPSI_FLIP
+// #endif
+
+#ifndef _ARK_ALLENCAHN_FLIP
+#define _ARK_ALLENCAHN_FLIP
 #endif
 
-// #ifndef _ARK_ALLENCAHN_FLIP
-// #define _ARK_ALLENCAHN_FLIP
-// #endif
-
-// #ifndef _GRAD_SCHEME_9Points
-// #define _GRAD_SCHEME_9Points 
-// #define _ARK_LAPLACIAN_SCHEME "9Points" 
-// #endif
+#ifndef _GRAD_SCHEME_9Points
+#define _GRAD_SCHEME_9Points 
+#define _ARK_LAPLACIAN_SCHEME "9Points" 
+#endif
 
 // #ifndef _GRAD_SCHEME_5Points
 // #define _GRAD_SCHEME_5Points 
@@ -111,30 +111,30 @@
 //
 //-------------------------------Force model------------------------------
 
-// #ifndef _ARK_FORCE_FLIP
-// #define _ARK_FORCE_FLIP
-// #define _ARK_FORCE_MODEL "He-Shan-Doolean"
-// #define _ARK_FORCE_H_Liang "none"
-// 	#ifndef _ARK_FORCE_H_Liang2014
-// 	#define _ARK_FORCE_H_Liang2014 
-// 	#define _ARK_FORCE_H_Liang "H.Liang PRE 2014"
-// 	#endif
-// // //
-// 	// #ifndef _ARK_FORCE_H_Liang2018
-// 	// #define _ARK_FORCE_H_Liang2018
-// 	// #define _ARK_FORCE_H_Liang  "H.Liang PRE 2018"
-// 	// #endif
+#ifndef _ARK_FORCE_FLIP
+#define _ARK_FORCE_FLIP
+#define _ARK_FORCE_MODEL "He-Shan-Doolean"
+//
+	#ifndef _ARK_FORCE_H_Liang2014
+	#define _ARK_FORCE_H_Liang2014 
+	#define _ARK_FORCE_H_Liang "H.Liang PRE 2014"
+	#endif
+// //
+	// #ifndef _ARK_FORCE_H_Liang2018
+	// #define _ARK_FORCE_H_Liang2018
+	// #define _ARK_FORCE_H_Liang  "H.Liang PRE 2018"
+	// #endif
+#endif
+
+// #ifndef _ARK_STRANGSPLIT_FLIP
+// #define _ARK_STRANGSPLIT_FLIP
+// #define _ARK_FORCE_MODEL "StrangSplitting"
 // #endif
 
-#ifndef _ARK_STRANGSPLIT_FLIP
-#define _ARK_STRANGSPLIT_FLIP
-#define _ARK_FORCE_MODEL "StrangSplitting"
-#endif
-
 //-------------------------------Momentum Energy-------------------------------
-#ifndef _ARK_MOMENTUM_FLIP
-#define _ARK_MOMENTUM_FLIP
-#endif
+// #ifndef _ARK_MOMENTUM_FLIP
+// #define _ARK_MOMENTUM_FLIP
+// #endif
 
 // #ifndef _ARK_THERMAL_FLIP
 // #define _ARK_THERMAL_FLIP

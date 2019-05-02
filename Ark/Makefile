@@ -1,8 +1,8 @@
 vpath %.h Header:Lib:Constant
 vpath %.cpp Cpp:Cpp/Mesh:Lib
 
-Target = PPDUGKS
-QModel = D2Q9PP
+Target = ACDUGKS
+QModel = D2Q9AC
 
 CC = g++ 
 

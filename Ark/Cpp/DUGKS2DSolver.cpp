@@ -11,7 +11,7 @@ using std::endl;
 
 double const aTP = 4.0/3.0, bTP = 1.0/3.0;
 
-int const ThreadNum = omp_get_max_threads();
+int const ThreadNum = 16;//omp_get_max_threads();
 
 double ResidualPer1k = 1.0;
 
