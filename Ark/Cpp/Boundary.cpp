@@ -33,7 +33,7 @@ void P_Outlet_5_Boundary()
 		#endif
 	}
 }
-void ExtrapolationfBP(Cell_2D *shadowCell,Cell_2D const *neighb,Cell_2D const *nextNeighb)
+void Extrapolation_DVDF_BarP(Cell_2D *shadowCell,Cell_2D const *neighb,Cell_2D const *nextNeighb)
 {
 	// shadowCell->MsQ().Phi = 2*neighb->MsQ().Phi - nextNeighb->MsQ().Phi;
 	// shadowCell->MsQ().Rho = 2*neighb->MsQ().Rho - nextNeighb->MsQ().Rho;
@@ -59,32 +59,27 @@ void ExtrapolationfBP(Cell_2D *shadowCell,Cell_2D const *neighb,Cell_2D const *n
 		shadowCell->g.BarP[k] = 2*neighb->g.BarP[k] - nextNeighb->g.BarP[k];
 		#endif
 	}
-	//!non-equilibrium extrapolation
-	LoopVS(Q)
-	{
-
-	}
 }
-void WallShadowC_fBP(Cell_2D &shadowCell)
+void Wall_3_Boundary(Cell_2D &shadowCell)
 {
 // used for GradfBP
 	unsigned const TOP = top,BOTTOM = bottom,LEFT = left,RIGHT = right;
 	#ifdef _CARTESIAN_MESH_FLIP
 	if(TOP == shadowCell.zone)
 	{
-		ExtrapolationfBP(&shadowCell,shadowCell.ShadowC,shadowCell.ShadowC->Cell_C[3]);
+		Extrapolation_DVDF_BarP(&shadowCell,shadowCell.ShadowC,shadowCell.ShadowC->Cell_C[3]);
 	}
 	else if(BOTTOM == shadowCell.zone)
 	{
-		ExtrapolationfBP(&shadowCell,shadowCell.ShadowC,shadowCell.ShadowC->Cell_C[1]);
+		Extrapolation_DVDF_BarP(&shadowCell,shadowCell.ShadowC,shadowCell.ShadowC->Cell_C[1]);
 	}
 	else if(RIGHT == shadowCell.zone)
 	{
-		ExtrapolationfBP(&shadowCell,shadowCell.ShadowC,shadowCell.ShadowC->Cell_C[2]);
+		Extrapolation_DVDF_BarP(&shadowCell,shadowCell.ShadowC,shadowCell.ShadowC->Cell_C[2]);
 	}
 	else if(LEFT == shadowCell.zone)
 	{
-		ExtrapolationfBP(&shadowCell,shadowCell.ShadowC,shadowCell.ShadowC->Cell_C[0]);
+		Extrapolation_DVDF_BarP(&shadowCell,shadowCell.ShadowC,shadowCell.ShadowC->Cell_C[0]);
 	}
 	#endif
 		//

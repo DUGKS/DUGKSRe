@@ -30,7 +30,6 @@ public:
 	double wdx_C[4] = {0.0};
 	double wdy_C[4] = {0.0};
 //---------------------Radial basis function--------------------------
-	double wRBF[9] = {0.0};// here 9 is RBF::DIM
 
 	void SetVolume();
 //

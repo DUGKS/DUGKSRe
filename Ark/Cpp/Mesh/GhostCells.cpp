@@ -106,7 +106,7 @@ void ShadowCellCornerConstruct()
 	else
 	{
 		cout <<"warning : No Periodic Boundary founded"<<endl;
-		getchar();
+		exit(-1);
 	}
 }
 void lrtbConstruct(Face_2D const* faceptr)

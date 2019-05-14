@@ -103,7 +103,7 @@ namespace PhaseFieldAC
 
 	Gx = 0.0,//4.0*Uc*(MuL+MuV)/(Ly*Ly), 
 
-	Gy = 0,//-6.25E-6,//0,
+	Gy = 0.0,//-6.25E-6,//0,
 	
 	TauMass = M_Phi/RT,
 
@@ -131,11 +131,11 @@ namespace PhaseFieldAC
 
 	// ReMP = sqrt(Gy*ChLength)*ChLength/Nu0,
 
-	T = 0.0;//(ChLength/U0)/::dt;//sqrt(ChLength/At/fabs(Gy))/::dt;//
+	T = sqrt(ChLength/At/fabs(Gy))/::dt;//(ChLength/U0)/::dt;
 
 	int const 
 
-	iT = 2.0*T;
+	iT = 3.0*T;
 }
 
 namespace PseudoPotentialSC
@@ -153,6 +153,11 @@ namespace PseudoPotentialSC
 	wI = 5,
 
 	radius = 0.25*ChLength;
+}
+
+namespace D2Q9
+{
+	double const Alpha = 0.8;
 }
 /*const int
 
@@ -177,7 +182,7 @@ const int
 
 VelocityZone = 7,//7 == TC
 
-End_Step = 100000,//log(2.0)/(8.0*PI*PI*Nu0*dt),
+End_Step = 0,//PhaseFieldAC::iT + 10000,//log(2.0)/(8.0*PI*PI*Nu0*dt),
 
 ZeroDebugControl = 100, //
 
@@ -185,7 +190,7 @@ ConvergenceControl = 100, //SumRho,SumT,independent
 
 ResidualControl = 1000, //print to screen
 
-writeFileControl = 10000; //always >= ResidualControl
+writeFileControl = 1000; //always >= ResidualControl
 
 double const
 

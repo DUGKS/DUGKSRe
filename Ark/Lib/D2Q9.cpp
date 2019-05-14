@@ -43,7 +43,7 @@ void DiscreteVelocityAssign()
 		xi_v[j] = MaSpan*D2Q9::xi_v[j];
 	}
 }
-void Update_phi_Eq(Cell_2D &cell)
+void Update_DVDF_Eq(Cell_2D &cell)
 {
 	double uu,u1;
 	uu = cell.MsQ().U*cell.MsQ().U + cell.MsQ().V*cell.MsQ().V;

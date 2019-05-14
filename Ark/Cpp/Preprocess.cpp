@@ -782,6 +782,8 @@ void AC_Drop()
 		#ifdef _ARK_ALLENCAHN_FLIP
 		CellArray[n].MsQ().Phi = AnalyticalPhiAC_Drop(CellArray[n].xc,CellArray[n].yc);
 		CellArray[n].MsQ().Rho = aPhi*(CellArray[n].MsQ().Phi) + bPhi;
+		CellArray[n].MsQ().Fx = 0.0;
+		CellArray[n].MsQ().Fy = 0.0;
 		#endif
 		
 //
@@ -1435,5 +1437,17 @@ void SelfCheck()
 			cout <<"\"UW\" != _FLUX_SCHEME_ARK"<<endl;
 			getchar();
 		}
+	}
+	if(End_Step != 0 && RESIDUAL < 1E-5)
+	{
+		_PRINT_ERROR_MSG_FLIP
+		cout <<"End_Step != 0 while RESIDUAL < 1E-5"<<endl;
+		exit(-1);
+	}
+	if(End_Step == 0 && RESIDUAL > 1E-5)
+	{
+		_PRINT_ERROR_MSG_FLIP
+		cout <<"End_Step == 0 while RESIDUAL > 1E-5"<<endl;
+		exit(-1);
 	}
 }

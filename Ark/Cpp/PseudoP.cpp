@@ -19,7 +19,7 @@ void Update_PseudoPsi(Cell_2D &cell)
 void Update_PseudoForce(Cell_2D &cell)
 {
 	update_Psi_x(&cell);
-  update_Psi_y(&cell);
+  	update_Psi_y(&cell);
 //
   cell.MsQ().Fx *= -cell.MsQ().scG*cell.MsQ().Psi;
   cell.MsQ().Fy *= -cell.MsQ().scG*cell.MsQ().Psi;

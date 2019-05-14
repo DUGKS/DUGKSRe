@@ -233,13 +233,12 @@ void Update_MacroVar_h(Face_2D& face)
 	#ifdef _ARK_MOMENTUM_FLIP
 	face.MsQh().U    = IntegralGH(Q,face.f.BhDt,xi_u);
 	face.MsQh().V    = IntegralGH(Q,face.f.BhDt,xi_v);
+	
 	#ifdef _ARK_FORCE_FLIP
 	face.MsQh().U += 0.5*hDt*face.MsQh().Fx;
 	face.MsQh().V += 0.5*hDt*face.MsQh().Fy;
 	#endif
 
-	// face.MsQh().U = 0.0;
-	// face.MsQh().V = 0.0;
 	face.MsQh().U /= face.MsQh().Rho;
 	face.MsQh().V /= face.MsQh().Rho;
 
@@ -324,28 +323,7 @@ void Update_MacroVar(Cell_2D& cell)
 	cell.f.tau = cell.MsQ().calcTau();
 	cell.Factor();
 	#endif
-//
-	// cell.MsQ().U    = (IntegralGH(cell.f.Tilde[0],xi_u))/(cell.MsQ().Rho*RT);
-	// cell.MsQ().V    = (IntegralGH(cell.f.Tilde[0],xi_v))/(cell.MsQ().Rho*RT);
-	// cell.MsQ().p    = IntegralGH(cell.f.Tilde[0]);
-	// #ifdef _ARK_FORCE_FLIP
-	// cell.MsQ().U += hDt*(cell.MsQ().Fx)/cell.MsQ().Rho;
-	// cell.MsQ().V += hDt*(cell.MsQ().Fy)/cell.MsQ().Rho;
-	// cell.MsQ().p += hDt*((cell.MsQ().Rho_x)*cell.MsQ().U + (cell.MsQ().Rho_y)*cell.MsQ().V);
-	// #endif
-	// cell.Mu = dynamicViscosity(cell.MsQ().Phi);
-	// cell.Tau = cell.Mu/(cell.MsQ().Rho*RT);
-	// cell.Factor();
 //----------------------------------------------------------------
-	// cell.MsQ().U    = (IntegralGH(cell.f.Tilde[0],xi_u))/cell.MsQ().Rho;
-	// cell.MsQ().V    = (IntegralGH(cell.f.Tilde[0],xi_v))/cell.MsQ().Rho;
-	// #ifdef _ARK_FORCE_FLIP
-	// cell.MsQ().U += hDt*(cell.MsQ().Fx)/cell.MsQ().Rho;
-	// cell.MsQ().V += hDt*(cell.MsQ().Fy)/cell.MsQ().Rho;
-	// #endif
-	// cell.MsQ().U    = (IntegralGH(cell.f.Tilde[0],xi_u))/Rho0;
-	// cell.MsQ().V    = (IntegralGH(cell.f.Tilde[0],xi_v))/Rho0;
-	// cell.MsQ().p    = 0.5*(cell.MsQ().Rho - Rho0)/Lambda0;
 }
 //
 void IntegralShearStress(){}

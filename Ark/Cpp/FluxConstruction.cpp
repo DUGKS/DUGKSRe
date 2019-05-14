@@ -193,6 +193,15 @@ void UW3rd_Interior_DVDF_Bh(Face_2D &face, Cell_2D* cellptr, int const k)
 
 	#ifdef _ARK_ALLENCAHN_FLIP
 	double hBP_x = 0.0, hBP_y = 0.0, hBP_xx = 0.0, hBP_yy = 0.0, hBP_xy = 0.0;
+
+	hBP_x  = update_DVDF_x(cellPointer, &Cell_2D::h, k);
+	hBP_y  = update_DVDF_y(cellPointer, &Cell_2D::h, k);
+	hBP_xx = update_DVDF_xx(cellPointer, &Cell_2D::h, k);
+	hBP_yy = update_DVDF_yy(cellPointer, &Cell_2D::h, k);
+	hBP_xy = update_DVDF_xy(cellPointer, &Cell_2D::h, k);
+
+	face.h.BhDt[k] = cellPointer->h.BarP[k] + dx*hBP_x + dy*hBP_y
+				   + dx*dx*hBP_xx/2 + dy*dy*hBP_yy/2 + dx*dy*hBP_xy;
 	#endif
 
 	//!momentum
@@ -227,7 +236,39 @@ void UW3rd_Interior_DVDF_Bh(Face_2D &face, int const k)
 	Cell_2D const *cellptrNeigh = targetCell(face.neigh);
 
 	#ifdef _ARK_ALLENCAHN_FLIP
-	double hBP_x = 0.0, hBP_y = 0.0, hBP_xx = 0.0, hBP_yy = 0.0, hBP_xy = 0.0;
+	double 
+	hBP_xOwner = 0.0, hBP_yOwner = 0.0, 
+	hBP_xxOwner = 0.0, hBP_yyOwner = 0.0, 
+	hBP_xyOwner = 0.0;
+
+	double 
+	hBP_xNeigh = 0.0, hBP_yNeigh = 0.0, 
+	hBP_xxNeigh = 0.0, hBP_yyNeigh = 0.0, 
+	hBP_xyNeigh = 0.0;
+
+	hBP_xOwner  = update_DVDF_x(cellptrOwner, &Cell_2D::h, k);
+	hBP_yOwner  = update_DVDF_y(cellptrOwner, &Cell_2D::h, k);
+	hBP_xxOwner = update_DVDF_xx(cellptrOwner, &Cell_2D::h, k);
+	hBP_yyOwner = update_DVDF_yy(cellptrOwner, &Cell_2D::h, k);
+	hBP_xyOwner = update_DVDF_xy(cellptrOwner, &Cell_2D::h, k);
+
+	hBP_xNeigh  = update_DVDF_x(cellptrNeigh, &Cell_2D::h, k);
+	hBP_yNeigh  = update_DVDF_y(cellptrNeigh, &Cell_2D::h, k);
+	hBP_xxNeigh = update_DVDF_xx(cellptrNeigh, &Cell_2D::h, k);
+	hBP_yyNeigh = update_DVDF_yy(cellptrNeigh, &Cell_2D::h, k);
+	hBP_xyNeigh = update_DVDF_xy(cellptrNeigh, &Cell_2D::h, k);
+
+	face.h.BhDt[k] = cellptrOwner->h.BarP[k]
+				   + dxOwner*hBP_xOwner + dyOwner*hBP_yOwner
+				   + dxOwner*dxOwner*hBP_xxOwner/2 + dyOwner*dyOwner*hBP_yyOwner/2
+				   + dxOwner*dyOwner*hBP_xyOwner;
+
+	face.h.BhDt[k] += cellptrNeigh->h.BarP[k]
+				   + dxNeigh*hBP_xNeigh + dyNeigh*hBP_yNeigh
+				   + dxNeigh*dxNeigh*hBP_xxNeigh/2 + dyNeigh*dyNeigh*hBP_yyNeigh/2
+				   + dxNeigh*dyNeigh*hBP_xyNeigh;
+
+	face.h.BhDt[k] /= 2;
 	#endif
 
 	//!momentum

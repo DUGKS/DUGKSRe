@@ -135,6 +135,8 @@ void OutputCase()
 				 <<PhaseFieldAC::Mo<<"    =    Morton number"<<endl
 				 <<PhaseFieldAC::ReMP<<"    =    Reynolds number"<<endl
 				 <<PhaseFieldAC::La<<"    =    Laplacian number"<<endl
+				 <<PhaseFieldAC::T<<"    =    Reference Time"<<endl
+				 <<PhaseFieldAC::iT<<"    =    End_Time"<<endl
 				 <<endl
 				 <<PhaseFieldAC::M_Phi<<"    =    mobility"<<endl
 				 <<PhaseFieldAC::TauMass<<"    =    mobility relaxition time"<<endl
@@ -153,6 +155,17 @@ void OutputCase()
 				 <<PhaseFieldAC::MuL/PhaseFieldAC::MuV<<"    =    "<<"dynamic viscosity ratio"<<endl
 				 <<PhaseFieldAC::radius/ChLength<<"    =    radius"<<endl
 				 <<_ARK_LAPLACIAN_SCHEME<<"    =    laplacian operator"<<endl
+				 <<"#-------------------------------------------"<<endl
+				 #endif
+//
+				 #ifdef _ARK_PSEUDOPSI_FLIP
+				 <<"-------------Pseudo Potential--------------"<<endl
+				 <<PseudoPotentialSC::RhoL <<"    =    liquid density"<<endl
+				 <<PseudoPotentialSC::RhoV <<"    =    vapor density"<<endl
+				 <<PseudoPotentialSC::K <<"    =    modified parameter"<<endl
+				 <<PseudoPotentialSC::wI<<"    =    initial inteface width"<<endl
+				 <<PseudoPotentialSC::radius/ChLength<<"    =    radius/ChLength"<<endl
+				 <<D2Q9::Alpha <<"    =    Alpha de D2V9PP Model"<<endl
 				 <<"#-------------------------------------------"<<endl
 				 #endif
 				 <<"#---------------------END--------------------"<<endl<<endl;
@@ -648,6 +661,7 @@ void Output_Diag(int step)
 		Cell_2D &cell = *CarCellArray[k][j];
 		OutFile_Diag<<cell.xc<<fs<<cell.MsQ().V<<endl;
 	}
+	//
 }
 // void writeHead(ofstream &OutFile,int const subZone)
 // {

@@ -34,21 +34,21 @@
 // #define _FLUX_SCHEME_ARK _FLUX_SCHEME_UW3RD_ARK
 // #endif
 
-#ifndef _FLUX_SCHEME_RBF_ARK
-#define _FLUX_SCHEME_RBF_ARK "RBF"	
-#define _FLUX_SCHEME_ARK _FLUX_SCHEME_RBF_ARK
-#endif
-
-
-// #ifndef _FLUX_SCHEME_CD_ARK
-// #define _FLUX_SCHEME_CD_ARK "CD"
-// #define _FLUX_SCHEME_ARK _FLUX_SCHEME_CD_ARK
+// #ifndef _FLUX_SCHEME_RBF_ARK
+// #define _FLUX_SCHEME_RBF_ARK "RBF"	
+// #define _FLUX_SCHEME_ARK _FLUX_SCHEME_RBF_ARK
 // #endif
+
+
+#ifndef _FLUX_SCHEME_CD_ARK
+#define _FLUX_SCHEME_CD_ARK "CD"
+#define _FLUX_SCHEME_ARK _FLUX_SCHEME_CD_ARK
+#endif
 
 //BB = bounce back,NEE = non-equilibrium extrapolation,DS = diffusive scattering
 
 #ifndef _BC_ARK
-#define _BC_ARK "periodic"
+#define _BC_ARK "Periodic"
 #endif
 
 #ifndef _EOS_MODEL_ARK
@@ -132,9 +132,9 @@
 // #endif
 
 //-------------------------------Momentum Energy-------------------------------
-// #ifndef _ARK_MOMENTUM_FLIP
-// #define _ARK_MOMENTUM_FLIP
-// #endif
+#ifndef _ARK_MOMENTUM_FLIP
+#define _ARK_MOMENTUM_FLIP
+#endif
 
 // #ifndef _ARK_THERMAL_FLIP
 // #define _ARK_THERMAL_FLIP

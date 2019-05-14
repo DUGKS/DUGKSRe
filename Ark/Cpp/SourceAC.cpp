@@ -50,9 +50,12 @@ void MacroSource(Cell_2D *cellptr)
 	#ifdef _ARK_FORCE_FLIP
 	SourceMomentum(cellptr);
 	#endif
+
 	cellptr->MsQ().p += (hDt*cellptr->MsQ().RhoXUYV()
 			  		- cellptr->MsQ().Rho*omega0*cellptr->MsQ().SqUV()*Lambda0);
 	cellptr->MsQ().p *= Kp;
+
+	// cellptr->MsQ().p += ::hDt*cellptr->MsQ().RhoXUYV()*RT;
 	#endif
 
 	double L = sqrt(cellptr->MsQ().SqPhixPhiy());

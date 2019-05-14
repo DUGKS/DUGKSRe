@@ -11,7 +11,7 @@ using std::endl;
 
 double const aTP = 4.0/3.0, bTP = 1.0/3.0;
 
-int const ThreadNum = 16;//omp_get_max_threads();
+int const ThreadNum = omp_get_max_threads();
 
 double ResidualPer1k = 1.0;
 
@@ -46,7 +46,7 @@ extern void P_Inlet_4_Boundary();
 
 extern void P_Outlet_5_Boundary();
 
-extern void WallShadowC_fBP(Cell_2D &shadowCell);
+extern void Wall_3_Boundary(Cell_2D &shadowCell);
 
 extern void Wall_3_DS(Face_2D &face);
 
@@ -213,7 +213,7 @@ void DUGKS2DSolver()
 	#ifdef _Wall_3_BCs_FLIP
 	#pragma omp for schedule(guided)
 	for(int n = 0;n < WallFaceNum;++n)
-		WallShadowC_fBP(WallShadowCA[n]);
+		Wall_3_Boundary(WallShadowCA[n]);
 	#endif
 	#ifdef _P_INLET_4_BCS_FLIP	
 		P_Inlet_4_Boundary();
@@ -227,7 +227,7 @@ void DUGKS2DSolver()
 	LoopPS(Cells)
 	{
 		// Grad_VS_LS(&CellArray[n]);
-		// Grad_VS_6points(&CellArray[n]);
+		Grad_VS_6points(&CellArray[n]);
 		// Grad_VS_4points(&CellArray[n]);
 		// Zero_GradBarPlus(CellArray[n]);
 	}
