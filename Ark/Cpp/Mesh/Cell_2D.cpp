@@ -58,6 +58,9 @@ void Cell_2D::DVDF::allocate()
 	allocateARK(BarP,Q);
 	allocateARK(BarP_x,Q);
 	allocateARK(BarP_y,Q);
+	allocateARK(BarP_xx,Q);
+	allocateARK(BarP_yy,Q);
+	allocateARK(BarP_xy,Q);
 	allocateARK(Tilde,Q);
 	allocateARK(Eq,Q);
 	allocateARK(So,Q);
@@ -67,6 +70,9 @@ void Cell_2D::DVDF::deallocate()
 	deallocateARK(BarP,Q);
 	deallocateARK(BarP_x,Q);
 	deallocateARK(BarP_y,Q);
+	deallocateARK(BarP_xx,Q);
+	deallocateARK(BarP_yy,Q);
+	deallocateARK(BarP_xy,Q);
 	deallocateARK(Tilde,Q);
 	deallocateARK(Eq,Q);
 	deallocateARK(So,Q);
@@ -76,6 +82,9 @@ void Cell_2D::DVDF::assign(const DVDF& rhs)
 	BarP = rhs.BarP;
 	BarP_x = rhs.BarP_x;
 	BarP_y = rhs.BarP_y;
+	BarP_xx = rhs.BarP_xx;
+	BarP_yy = rhs.BarP_yy;
+	BarP_xy = rhs.BarP_xy;
 	Tilde  = rhs.Tilde;
 	Eq  = rhs.Eq;
 	So  = rhs.So;

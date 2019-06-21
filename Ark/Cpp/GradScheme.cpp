@@ -50,6 +50,20 @@ void Grad_VS_6points(Cell_2D *cellptr)
 	update_DVDF_Grad6points(cellptr,&Cell_2D::g);
 	#endif
 }
+void Grad_VS_6points_Third(Cell_2D *cellptr)
+{
+	#ifdef _ARK_ALLENCAHN_FLIP
+	update_DVDF_Grad6points_Third(cellptr,&Cell_2D::h);
+	#endif
+	//!momentum
+	#ifdef _ARK_MOMENTUM_FLIP
+	update_DVDF_Grad6points_Third(cellptr,&Cell_2D::f);
+	#endif
+	//
+	#ifdef _ARK_THERMAL_FLIP
+	update_DVDF_Grad6points_Third(cellptr,&Cell_2D::g);
+	#endif
+}
 void Grad_VS_LS(Cell_2D *center)
 {
 	#ifdef _ARK_ALLENCAHN_FLIP
@@ -180,7 +194,6 @@ double update_Phi_xx(Cell_2D *cellptr)
 // }
 void update_Laplacian_Phi(Cell_2D *cellptr)
 {
-	#ifdef _GRAD_SCHEME_9Points
 	cellptr->msq->laplacianPhi
 	=
 	(	4*
@@ -195,17 +208,6 @@ void update_Laplacian_Phi(Cell_2D *cellptr)
 	  	)
 	-	20*(cellptr->msq->Phi)
 	)/(6*MinL*MinL);
-	#endif
-	//---------------------------5points--------------------
-	#ifdef _GRAD_SCHEME_5Points
-	cellptr->msq->laplacianPhi
-	=
-	(
-		cellptr->Cell_C[0]->msq->Phi + cellptr->Cell_C[1]->msq->Phi
-	+   cellptr->Cell_C[2]->msq->Phi + cellptr->Cell_C[3]->msq->Phi
-	-	4*(cellptr->msq->Phi)
-	)/MinL*MinL;
-	#endif
 }
 void Grad_Phi_6points(Cell_2D *center)
 {

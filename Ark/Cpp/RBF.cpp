@@ -163,7 +163,7 @@ void RBFPrecisionTest()
 	// {
 	// 	Cell_2D &cell = CellArray[n];
 	// 	double tmpAN = cell.Cell_C[3]->MsQ().Rho - valueRBF(&cell,0,-::dy);
-	// 	if(fabs(tmpAN) > ::infinitesimal)
+	// 	if(fabs(tmpAN) > ::TINY)
 	// 	Info << tmpAN<<endl;
 	// }
 	// double ErrorLmax = 0.0,Errortmp = 0.0;

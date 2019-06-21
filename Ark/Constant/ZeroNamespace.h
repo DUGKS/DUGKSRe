@@ -7,7 +7,7 @@
 //------------------------------Normalized Parameters----------------------------
 const double 
 
-CFL = 0.5,
+CFL = -4,
 
 dt = CFL > 0.0 ? CFL*MinL/MaxU: 1.0E-4,
 
@@ -194,6 +194,6 @@ writeFileControl = 1000; //always >= ResidualControl
 
 double const
 
-RESIDUAL = 1E-8;
+RESIDUAL = 1E-6;
 
 #endif

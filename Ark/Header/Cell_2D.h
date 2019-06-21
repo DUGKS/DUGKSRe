@@ -45,11 +45,12 @@ public:
 		double aBP = 0.0,bBP = 0.0,cBP = 0.0;
 		inline void setxBP();
 		//
-		static int const nDVDF = 6;
-
 		double *BarP = nullptr;
 		double *BarP_x = nullptr;
 		double *BarP_y = nullptr;
+		double *BarP_xx = nullptr;
+		double *BarP_yy = nullptr;
+		double *BarP_xy = nullptr;
 		double *Tilde = nullptr;
 		double *Eq    = nullptr;
 		double *So    = nullptr;

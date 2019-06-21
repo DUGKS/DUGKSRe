@@ -26,12 +26,12 @@ class Cell_2D;
 inline 
 void SetZero(double &d)
 {
-	if(d < infinitesimal && d > -infinitesimal) d= 0.0;
+	if(d < TINY && d > -TINY) d= 0.0;
 }
 inline 
 bool EqualZero(double const &d)
 {
-	return (d < infinitesimal && d > -infinitesimal) ? true : false;
+	return (d < TINY && d > -TINY) ? true : false;
 }
 inline 
 bool doubleEqual(double const &c,double const &d)

@@ -1,10 +1,10 @@
 vpath %.h Header:Lib:Constant
 vpath %.cpp Cpp:Cpp/Mesh:Lib
 
-Target = ACDUGKS
-QModel = D2Q9AC
+Target = DUGKS3rd
+QModel = D2Q9
 
-CC = g++
+CC = icpc
 
 CFLAGS = -std=c++11 -Wall -Wextra -I./Header -I./Lib -I./Constant -O3
 

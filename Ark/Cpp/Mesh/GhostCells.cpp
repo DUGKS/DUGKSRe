@@ -30,9 +30,9 @@ bool locateFace(Face_2D const *faceptr,double const Y,double const X)
 {
 	return
 	(
-		fabs(faceptr->yf - Y) < infinitesimal
+		fabs(faceptr->yf - Y) < TINY
 		&&
-		fabs(faceptr->xf - X) < infinitesimal
+		fabs(faceptr->xf - X) < TINY
 	);
 }
 void LeftRightPeriodic()

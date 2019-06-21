@@ -267,10 +267,10 @@ void AC_Drop_L2Norm(double &L2_Phi)
 }
 void Output_L2Norm(double const &t,double &L2_uv, double &L2_p)
 {	
-	//ForceDrivenTaylorGreen_L2Norm(L2_uv,L2_p);
+	ForceDrivenTaylorGreen_L2Norm(L2_uv,L2_p);
 	//TaylorCouette_L2Norm(L2_uv);
 	//LayeredPoiseuille_L2Norm(L2_uv);
-	AC_Drop_L2Norm(L2_uv);
+	// AC_Drop_L2Norm(L2_uv);
 	ostringstream oss_L2;
 	oss_L2 <<"../FlowField/Convergence/L2_uvp_mu"<<Mu0<<"_Re"<<Re<<"_"<<_MESHFILE_NAME_ARK<<".dat";
 	ofstream OutFile_L2(oss_L2.str().c_str(),ofstream::app);

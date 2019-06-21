@@ -102,6 +102,8 @@ extern void Grad_VS_LS(Cell_2D *center);
 
 extern void Grad_VS_6points(Cell_2D *center);
 
+extern void Grad_VS_6points_Third(Cell_2D *center);
+
 extern void Grad_VS_4points(Cell_2D *center);
 
 //---------------------------------FluxConstruction.cpp-------------------------
@@ -111,7 +113,7 @@ extern void UW_Interior_DVDF_Bh(Face_2D& face,Cell_2D const* ptr_C,int const k);
 
 extern void UW_Interior_DVDF_Bh(Face_2D& face,int const k);
 
-extern void UW3rd_Interior_DVDF_Bh(Face_2D &face, Cell_2D* cellptr, int const k);
+extern void UW3rd_Interior_DVDF_Bh(Face_2D &face, Cell_2D const* cellptr, int const k);
 
 extern void UW3rd_Interior_DVDF_Bh(Face_2D& face,int const k);
 
@@ -222,16 +224,20 @@ void DUGKS2DSolver()
 		P_Outlet_5_Boundary();
 	#endif
 //-------------------------------Update Grad DVDF_BarPlus-------------------------------
-	#ifdef _FLUX_SCHEME_UW_ARK
+
 	#pragma omp for schedule(guided)
 	LoopPS(Cells)
 	{
 		// Grad_VS_LS(&CellArray[n]);
+		#ifdef _FLUX_SCHEME_UW_ARK
 		Grad_VS_6points(&CellArray[n]);
+		#endif
 		// Grad_VS_4points(&CellArray[n]);
+		#ifdef _FLUX_SCHEME_UW3RD_ARK
+		Grad_VS_6points_Third(&CellArray[n]);
+		#endif
 		// Zero_GradBarPlus(CellArray[n]);
 	}
-	#endif
 //-------------------------------Flux-------------------------------------
 //-------------------------------Interior Face-----------------------------
 
@@ -628,29 +634,29 @@ void Update_Residual(int step)
 {
 #ifndef _ARK_ENDTIME_FLIP
 //---------------------------density residual-------------------------
-	double SumRho = 0.0,SumdRho = 0.0;
-	double dRho = 0.0;
-	LoopPS(Cells)
-	{
-		dRho = CellArray[n].MsQ().Rho - CellArray[n].MsQ().Rho_1k;
-		SumdRho += dRho*dRho;
-		SumRho += CellArray[n].MsQ().Rho*CellArray[n].MsQ().Rho;
-		CellArray[n].MsQ().Rho_1k = CellArray[n].MsQ().Rho;
-	}
-	ResidualPer1k = sqrt(SumdRho/(SumRho + 1.0E-30));
-//---------------------------velocity residual--------------------------
-	// double SumUV = 0.0,Sumdudv = 0.0;
-	// double du = 0.0, dv = 0.0;
-	// for(int i = 0;i < Cells;++i)
+	// double SumRho = 0.0,SumdRho = 0.0;
+	// double dRho = 0.0;
+	// LoopPS(Cells)
 	// {
-	// 	du = CellArray[i].MsQ().U - CellArray[i].MsQ().U_1k;
-	// 	dv = CellArray[i].MsQ().V - CellArray[i].MsQ().V_1k;
-	// 	Sumdudv += du*du + dv*dv;
-	// 	SumUV += CellArray[i].MsQ().SqUV();
-	// 	CellArray[i].MsQ().U_1k = CellArray[i].MsQ().U;
-	// 	CellArray[i].MsQ().V_1k = CellArray[i].MsQ().V;
+	// 	dRho = CellArray[n].MsQ().Rho - CellArray[n].MsQ().Rho_1k;
+	// 	SumdRho += dRho*dRho;
+	// 	SumRho += CellArray[n].MsQ().Rho*CellArray[n].MsQ().Rho;
+	// 	CellArray[n].MsQ().Rho_1k = CellArray[n].MsQ().Rho;
 	// }
-	// ResidualPer1k = sqrt(Sumdudv/(SumUV + 1.0E-30));
+	// ResidualPer1k = sqrt(SumdRho/(SumRho + 1.0E-30));
+//---------------------------velocity residual--------------------------
+	double SumUV = 0.0,Sumdudv = 0.0;
+	double du = 0.0, dv = 0.0;
+	for(int i = 0;i < Cells;++i)
+	{
+		du = CellArray[i].MsQ().U - CellArray[i].MsQ().U_1k;
+		dv = CellArray[i].MsQ().V - CellArray[i].MsQ().V_1k;
+		Sumdudv += du*du + dv*dv;
+		SumUV += CellArray[i].MsQ().SqUV();
+		CellArray[i].MsQ().U_1k = CellArray[i].MsQ().U;
+		CellArray[i].MsQ().V_1k = CellArray[i].MsQ().V;
+	}
+	ResidualPer1k = sqrt(Sumdudv/(SumUV + 1.0E-30));
 //----------------------------------------------------------------------
 
 	Output_Residual(step*dt,ResidualPer1k);

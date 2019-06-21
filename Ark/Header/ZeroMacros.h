@@ -26,7 +26,7 @@
 
 double const
 
-infinitesimal = 1.0E-14,
+TINY = 1.0E-14,
 
 PI = 3.141592653589793;
 

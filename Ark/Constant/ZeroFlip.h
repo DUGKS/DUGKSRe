@@ -29,10 +29,10 @@
 // #define _FLUX_SCHEME_ARK _FLUX_SCHEME_UW_ARK
 // #endif
 
-// #ifndef _FLUX_SCHEME_UW3RD_ARK
-// #define _FLUX_SCHEME_UW3RD_ARK "UW3rd"	
-// #define _FLUX_SCHEME_ARK _FLUX_SCHEME_UW3RD_ARK
-// #endif
+#ifndef _FLUX_SCHEME_UW3RD_ARK
+#define _FLUX_SCHEME_UW3RD_ARK "UW3rd"	
+#define _FLUX_SCHEME_ARK _FLUX_SCHEME_UW3RD_ARK
+#endif
 
 // #ifndef _FLUX_SCHEME_RBF_ARK
 // #define _FLUX_SCHEME_RBF_ARK "RBF"	
@@ -40,10 +40,10 @@
 // #endif
 
 
-#ifndef _FLUX_SCHEME_CD_ARK
-#define _FLUX_SCHEME_CD_ARK "CD"
-#define _FLUX_SCHEME_ARK _FLUX_SCHEME_CD_ARK
-#endif
+// #ifndef _FLUX_SCHEME_CD_ARK
+// #define _FLUX_SCHEME_CD_ARK "CD"
+// #define _FLUX_SCHEME_ARK _FLUX_SCHEME_CD_ARK
+// #endif
 
 //BB = bounce back,NEE = non-equilibrium extrapolation,DS = diffusive scattering
 
@@ -56,7 +56,7 @@
 #endif
 
 #ifndef _MESHFILE_NAME_ARK
-#define _MESHFILE_NAME_ARK "128_128_Car_Periodic_Square_LBM"
+#define _MESHFILE_NAME_ARK "32_Car_Periodic_Square"
 #endif
 //----------------Boundary Condition Macro------------------
 
@@ -95,20 +95,10 @@
 // #define _ARK_PSEUDOPSI_FLIP
 // #endif
 
-#ifndef _ARK_ALLENCAHN_FLIP
-#define _ARK_ALLENCAHN_FLIP
-#endif
-
-#ifndef _GRAD_SCHEME_9Points
-#define _GRAD_SCHEME_9Points 
-#define _ARK_LAPLACIAN_SCHEME "9Points" 
-#endif
-
-// #ifndef _GRAD_SCHEME_5Points
-// #define _GRAD_SCHEME_5Points 
-// #define _ARK_LAPLACIAN_SCHEME "5Points" 
+// #ifndef _ARK_ALLENCAHN_FLIP
+// #define _ARK_ALLENCAHN_FLIP
 // #endif
-//
+
 //-------------------------------Force model------------------------------
 
 #ifndef _ARK_FORCE_FLIP
@@ -149,9 +139,9 @@
 // #define _ARK_ENDTIME_FLIP
 // #endif
 
-// #ifndef _OUTPUT_L2NORM_ERROR_FLIP
-// #define _OUTPUT_L2NORM_ERROR_FLIP
-// #endif
+#ifndef _OUTPUT_L2NORM_ERROR_FLIP
+#define _OUTPUT_L2NORM_ERROR_FLIP
+#endif
 
 // #ifndef _ARK_NOHUP_FLIP	//Flip on for server
 // #define _ARK_NOHUP_FLIP

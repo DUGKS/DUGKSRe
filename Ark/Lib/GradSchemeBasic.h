@@ -181,34 +181,19 @@ void update_DVDF_Grad6points(Cell_2D *cellptr,Cell_2D::DVDF Cell_2D::*dvdf)
 {
 	LoopVS(Q)
 	{
-	// 	(cellptr->*dvdf).BarP_x[k]
-	// 	=
-	// 	(
-	// 		apsi*
-	//   	  	(
-	//   	    ((cellptr->Cell_C[0]->*dvdf).BarP[k]) - ((cellptr->Cell_C[2]->*dvdf).BarP[k])
-	//   	  	)
-	//   	  + bpsi*
-	//   	  	(
-	//   			((cellptr->Cell_Diag[0]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[1]->*dvdf).BarP[k])
-	//   		+   ((cellptr->Cell_Diag[3]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[2]->*dvdf).BarP[k])
-	//   	  	)
-	// 	)/(_2dx*6);
-	// //
-	// 	(cellptr->*dvdf).BarP_y[k] = 
-	// 	(
-	// 		apsi*
-	// 	    (
-	// 	      ((cellptr->Cell_C[1]->*dvdf).BarP[k]) - ((cellptr->Cell_C[3]->*dvdf).BarP[k])
-	// 	    )
-	// 	  + bpsi*
-	// 	    (
-	// 	  		((cellptr->Cell_Diag[0]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[3]->*dvdf).BarP[k])
-	// 	  	+   ((cellptr->Cell_Diag[1]->*dvdf).BarP[k]) - ((cellptr->Cell_Diag[2]->*dvdf).BarP[k])
-	// 	  	)
-	// 	)/(_2dy*6);
 		(cellptr->*dvdf).BarP_x[k] = update_DVDF_x(cellptr,dvdf,k);
 		(cellptr->*dvdf).BarP_y[k] = update_DVDF_y(cellptr,dvdf,k);
+	}
+}
+void update_DVDF_Grad6points_Third(Cell_2D *cellptr,Cell_2D::DVDF Cell_2D::*dvdf)
+{
+	LoopVS(Q)
+	{
+		(cellptr->*dvdf).BarP_x[k] = update_DVDF_x(cellptr,dvdf,k);
+		(cellptr->*dvdf).BarP_y[k] = update_DVDF_y(cellptr,dvdf,k);
+		(cellptr->*dvdf).BarP_xx[k] = update_DVDF_xx(cellptr,dvdf,k);
+		(cellptr->*dvdf).BarP_yy[k] = update_DVDF_yy(cellptr,dvdf,k);
+		(cellptr->*dvdf).BarP_xy[k] = update_DVDF_xy(cellptr,dvdf,k);
 	}
 }
 void update_DVDF_Grad_LS(Cell_2D *center,Cell_2D::DVDF Cell_2D::*dvdf)

@@ -274,7 +274,7 @@ void faceCellsCheck(Face_2D const &face)
 {
 	if(face.Vx == 0)
 	{
-		if(face.owner->yc != face.faceCells[0]->yc)
+		if(!doubleEqual(face.owner->yc , face.faceCells[0]->yc))
 		{
 			printErrorLine();
 			_PRINT_ERROR_MSG_FLIP
@@ -282,7 +282,7 @@ void faceCellsCheck(Face_2D const &face)
 			printErrorLine(nl);
 			exit(-1);
 		}
-		if(face.owner->yc != face.faceCells[2]->yc)
+		if(!doubleEqual(face.owner->yc , face.faceCells[2]->yc))
 		{
 			printErrorLine();
 			_PRINT_ERROR_MSG_FLIP
@@ -290,7 +290,7 @@ void faceCellsCheck(Face_2D const &face)
 			printErrorLine(nl);
 			exit(-1);
 		}
-		if(face.neigh->yc != face.faceCells[1]->yc)
+		if(!doubleEqual(face.neigh->yc , face.faceCells[1]->yc))
 		{
 			printErrorLine();
 			_PRINT_ERROR_MSG_FLIP
@@ -298,7 +298,7 @@ void faceCellsCheck(Face_2D const &face)
 			printErrorLine(nl);
 			exit(-1);
 		}
-		if(face.neigh->yc != face.faceCells[3]->yc)
+		if(!doubleEqual(face.neigh->yc , face.faceCells[3]->yc))
 		{
 			printErrorLine();
 			_PRINT_ERROR_MSG_FLIP
@@ -309,7 +309,7 @@ void faceCellsCheck(Face_2D const &face)
 	}
 	else if(face.Vy == 0)
 	{
-		if(face.owner->xc != face.faceCells[0]->xc)
+		if(!doubleEqual(face.owner->xc , face.faceCells[0]->xc))
 		{
 			printErrorLine();
 			_PRINT_ERROR_MSG_FLIP
@@ -317,7 +317,7 @@ void faceCellsCheck(Face_2D const &face)
 			printErrorLine(nl);
 			exit(-1);
 		}
-		if(face.owner->xc != face.faceCells[2]->xc)
+		if(!doubleEqual(face.owner->xc , face.faceCells[2]->xc))
 		{
 			printErrorLine();
 			_PRINT_ERROR_MSG_FLIP
@@ -325,7 +325,7 @@ void faceCellsCheck(Face_2D const &face)
 			printErrorLine(nl);
 			exit(-1);
 		}
-		if(face.neigh->xc != face.faceCells[1]->xc)
+		if(!doubleEqual(face.neigh->xc , face.faceCells[1]->xc))
 		{
 			printErrorLine();
 			_PRINT_ERROR_MSG_FLIP
@@ -333,11 +333,13 @@ void faceCellsCheck(Face_2D const &face)
 			printErrorLine(nl);
 			exit(-1);
 		}
-		if(face.neigh->xc != face.faceCells[3]->xc)
+		if(!doubleEqual(face.neigh->xc , face.faceCells[3]->xc))
 		{
 			printErrorLine();
 			_PRINT_ERROR_MSG_FLIP
 			cout <<"Fatal Error : faceCells[3] xc doesn't match"<<endl;
+			cout <<face.neigh->xc<<"    "<<face.faceCells[3]->xc<<"    "
+				 <<(face.neigh->xc-face.faceCells[3]->xc)<<endl;
 			printErrorLine(nl);
 			exit(-1);
 		}
@@ -381,7 +383,7 @@ int MeshCheck()
 			_PRINT_ERROR_MSG_FLIP
 			getchar();
 		}
-		if(FaceArray[i].Area != MinL)
+		if(!doubleEqual(FaceArray[i].Area,MinL))
 		{
 			cout << "FaceArray : " << i <<" Vx : " << FaceArray[i].Vx
 				 <<" Vx : " << FaceArray[i].Vy <<" Area: "
@@ -667,7 +669,7 @@ int MeshCheck()
 			getchar();
 		}
 		#ifdef _CARTESIAN_MESH_FLIP
-		if(MinL*MinL != CellArray[i].volume)
+		if(!doubleEqual(MinL*MinL,CellArray[i].volume))
 		{
 			_PRINT_ERROR_MSG_FLIP
 			cout << "CellArray : " << i <<" unmatch cell volume : "

@@ -30,7 +30,7 @@ void sortFacesInThisCell(Cell_2D &cell)
 	Face_2D *Facetmp[4] = {nullptr,nullptr,nullptr,nullptr};
 	for(int i = 0;i < cell.celltype;++i)
 	{
-		if(fabs(cell.Face_C[i]->xf - cell.xc) > infinitesimal)
+		if(fabs(cell.Face_C[i]->xf - cell.xc) > TINY)
 		{
 			if(cell.Face_C[i]->xf > cell.xc)
 			{
